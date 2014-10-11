@@ -1,0 +1,119 @@
+body {
+  padding-top: 0px;
+}
+
+#wrap {
+  padding-top: 50px;
+}
+
+// SCOPE [
+
+.node-name {
+  display: block;
+}
+
+.scope-name {
+  display: block;
+  background: #ccc;
+  padding: 5px;
+  font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+  margin-bottom: 10px;
+}
+
+.scope > .node {
+ margin-bottom: 10px;
+}
+
+.scope {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  /*
+    Introduced in IE 10.
+    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+  */
+  -ms-user-select: none;
+  user-select: none;
+}
+
+pre {
+  -moz-user-select: text;
+  -khtml-user-select: text;
+  -webkit-user-select: text;
+  /*
+    Introduced in IE 10.
+    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+  */
+  -ms-user-select: text;
+  user-select: text;
+}
+// SCOPE ]
+
+// MENU [
+
+#menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  border-bottom: 5px solid #ddd;
+  background: #eee;
+//  min-height: 50px;
+}
+
+#menu button {
+  margin: 10px;
+  color: #333;
+  background-color: #fff;
+//  border-color: #ccc;
+  border: .1em solid hsl(0,0%,33%);
+//  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 6px 12px;
+
+}
+
+#menu button:active {
+  outline: 0;
+  background-color: #efe;
+}
+
+#menu .selection-mode {
+  display: inline-block;
+  padding-left: 20px;
+}
+
+// MENU ]
+
+// RADIO BUTTONS [
+
+/*
+  Hide radio button (the round disc)
+  we will use just the label to create pushbutton effect
+*/
+input[type=radio] {
+  display:none;
+  margin:10px;
+}
+
+/*
+  Change the look'n'feel of labels (which are adjacent to radiobuttons).
+  Add some margin, padding to label
+*/
+input[type=radio] + label {
+  display:inline-block;
+  margin:-2px;
+  padding: 4px 12px;
+  background-color: #fff;
+  border-color: #ddd;
+}
+/*
+ Change background color for label next to checked radio button
+ to make it look like highlighted button
+*/
+input[type=radio]:checked + label {
+  background-image: none;
+  background-color:#f0d0f0;
+}
+// RADIO BUTTONS ]

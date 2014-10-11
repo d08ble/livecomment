@@ -1,0 +1,38 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name='description', content='livecomment for live projects')
+    meta(name='author', content='d08ble')
+    title livecomment
+
+    != css('prism/prism.css')
+    != css('styles')
+    != js('application')
+  body
+    #wrap
+      block content
+    #menu
+      button#btnmm --
+      button#btnpp ++
+      button#btnmc -[]
+      button#btnpc +[]
+      .selection-mode
+        input(type='radio',id='radio1',name='smode',value='A')
+        label(for='radio1') CODE
+        input(type='radio',id='radio2',name='smode',value='B')
+        label(for='radio2') CHILD
+        input(type='radio',id='radio3',name='smode',value='C')
+        label(for='radio3') ALL
+        input(type='radio',id='radio4',name='smode',value='D',checked=true)
+        label(for='radio4') CODE R
+        input(type='radio',id='radio5',name='smode',value='E')
+        label(for='radio5') CHILD R
+        input(type='radio',id='radio6',name='smode',value='F')
+        label(for='radio6') ALL R
+      .heartbeat(style='dispaly:inline-block;float:right;margin:7px 10px 0 0')
+        img(src='/img/heartbeat.gif')
+//
+  != css('hljs/default.css')

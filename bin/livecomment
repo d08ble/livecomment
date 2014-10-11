@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+var LiveComment = require('../livecomment');
+
+var options = {
+  dirs: [
+    __dirname+'/..'
+  ],
+  'ignore watch scan': 'node_modules',
+  'ignore watch scan 1': '.idea'
+}
+
+var livecomment = new LiveComment(options);
