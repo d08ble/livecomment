@@ -1,12 +1,10 @@
 In progress..10%..20%..25%..45%..51%..55%
 
-START [
+Run:
 $ node bin/livecomment
-START ]
 
-URL [
+Open url:
 http://localhost:3070/
-URL ]
 
 *** LIVE COMMENT FOR 80/20 DEVELOPERS ***
 *** -1'000'000+ miles for your target ***
