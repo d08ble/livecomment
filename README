@@ -1,5 +1,9 @@
 In progress..10%..20%..25%..45%..51%..55%
 
+START [
+$ node bin/livecomment
+START ]
+
 URL [
 http://localhost:3070/
 URL ]

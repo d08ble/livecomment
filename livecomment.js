@@ -28,6 +28,9 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.8 [
+// [+] require scanwatch. config changed (see bin/livecomment)
+// 0.2.8 ]
 // 0.2.7 [
 // [+] added sh pro
 // 0.2.7 ]
@@ -72,6 +75,7 @@ var walk = require('walkdir');
 var async = require('async');
 var md5 = require('MD5');
 var events = require('events');
+var scanwatch = require('scanwatch');
 
 // MODULE DEPS ]
 
@@ -455,6 +459,8 @@ function LiveComment(options) {
 
   // ANALYZE FILE ]
 
+
+
   // CHECK PATH [
 
   function checkContainsPathComponent(dirs, path) {
@@ -465,56 +471,19 @@ function LiveComment(options) {
   }
   // CHECK PATH ]
 
-  // SCAN DIR [
+  // SCANWATCH [
 
-  var scannedDirs = [];
+  scanwatch.setup(options, function (type, file) {
+    console.log(type, file)
+    if (fs.existsSync(file) && !fs.lstatSync(file).isDirectory()) {
+      analyze(file)
+    }
+  })
 
-  // add base path for watch
-  _.each(config.dirs, function(dir) {
-    scannedDirs.push(path.resolve(dir));
-  });
-
-  console.log('Scan files [');
-  _.each(config.dirs, function(dir) {
-    console.log(dir+' [');
-    walk.sync(dir, function(path, stat) {
-      if (!checkContainsPathComponent(ignoreScan, path)) {
-        if (!stat.isDirectory()) {
-          console.log(path);
-          analyze(path);
-        } else {
-          scannedDirs.push(path);
-        }
-      } else {
-        if (config.debug)
-          console.log('[skipping]', path)
-      }
-    });
-    console.log(dir+' ]');
-  });
-  console.log('Scan files ]');
-
-  // SCAN DIR ]
-
-  // WATCH [
-
-  console.log('Watch for changes [');
-  _.each(scannedDirs, function(dir) {
-    console.log(' ', dir);
-    watch(dir, { recursive: false, followSymLinks: false }, function(filename) {
-      filename = path.resolve(filename);
-      // ON FILE/DIR CHANGED [
-      console.log(filename, ' changed.');
-      analyze(filename);
-      // ON FILE/DIR CHANGED ]
-    });
-  });
-  console.log('Watch for changes ]');
-
-  // WATCH ]
+  // SCANWATCH ]
 
 };
 
 // LiveComment ]
 
-module.exports = LiveComment;
+module.exports = LiveComment

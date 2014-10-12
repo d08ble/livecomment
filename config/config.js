@@ -1,7 +1,6 @@
+// DEFAULT CONFIG [
 module.exports = {
-  dirs: [
-    '../'
-  ],
+  dirs: {},
 
   port: 3070,
   debug: false,
@@ -26,13 +25,5 @@ module.exports = {
     'pro': 'c',
     'sh': 'c'
   }
-
-  //'ignore [watch] [scan]': 'relative/path'
 };
-// <<<<<<<<<>>>>>><><>
-
-// FORMAT 1 - SIMPLE PATH [
-/*
-  '/fullpath/to/livecomment/'
-*/
-// FORMAT 1 - SIMPLE PATH ]
+// DEFAULT CONFIG ]

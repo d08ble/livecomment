@@ -1,13 +1,26 @@
 #!/usr/bin/env node
 
-var LiveComment = require('../livecomment');
+var LiveComment = require('../livecomment')
 
 var options = {
-  dirs: [
-    __dirname+'/..'
-  ],
-  'ignore watch scan': 'node_modules',
-  'ignore watch scan 1': '.idea'
+    debug: 1,
+    common: {
+      ignore: [
+        '.git',
+        '.git/**',
+        'node_modules',
+        'node_modules/**',
+        'node_modules/**/.*',
+        'node_modules/**/.*/**'
+//        /\/node_modules.*/
+      ]
+    },
+    paths: {}
+}
+options.paths[__dirname+'/..'] = {
+    ignore: [
+      /^\.idea.*/
+    ]
 }
 
-var livecomment = new LiveComment(options);
+var livecomment = new LiveComment(options)
