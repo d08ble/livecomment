@@ -2,7 +2,7 @@
   "author": "d08ble",
   "name": "livecomment",
   "description": "Live comment for your live code",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "repository": {
     "type": "git",
     "url": "https://github.com/d08ble/livecomment.git"

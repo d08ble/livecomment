@@ -28,6 +28,9 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.9 [
+// [+] type 'skip' bugfix
+// 0.2.9 ]
 // 0.2.8 [
 // [+] require scanwatch. config changed (see bin/livecomment)
 // 0.2.8 ]
@@ -475,7 +478,7 @@ function LiveComment(options) {
 
   scanwatch.setup(options, function (type, file) {
     console.log(type, file)
-    if (fs.existsSync(file) && !fs.lstatSync(file).isDirectory()) {
+    if (type != 'skip' && fs.existsSync(file) && !fs.lstatSync(file).isDirectory()) {
       analyze(file)
     }
   })
