@@ -23,7 +23,8 @@
 
 // SOLVED [
 // 0.2.10 [
-// [ ] configure ws port
+// [+] bugfix: scan break when remaining+'\n' > 0
+// [+] configure ws port
 // [ ] code execution client
 // [+] code execution server
 // [+] reconnect on each message bugfix: socket.io 1.2.0 updated
