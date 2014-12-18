@@ -3,6 +3,7 @@ module.exports = {
   dirs: {},
 
   port: 3070,
+  ws_port: 8980,
   debug: false,
 
   extlangs: {
@@ -24,6 +25,6 @@ module.exports = {
 
     'pro': 'c',
     'sh': 'c'
-  }
+  },
 };
 // DEFAULT CONFIG ]

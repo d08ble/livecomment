@@ -8,12 +8,6 @@
 // https://www.npmjs.org/package/livecomment
 // URL NPM ]
 
-// TODO [
-// [ ] add onLoaded event at startup -> send event:'state'
-// [ ] shell scripts highlight
-// [ ] fix crash out of memory while scan binary files (add async logic)
-// TODO ]
-
 
 // KNOWN BUGS [
 // [ ] experiment code. code review required
@@ -28,6 +22,17 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.10 [
+// [ ] configure ws port
+// [ ] code execution client
+// [+] code execution server
+// [+] reconnect on each message bugfix: socket.io 1.2.0 updated
+// [+] tested: add onLoaded event at startup -> send event:'state'
+// [+] bugfix: add new object client updateState is wrong
+// [+] bugfix: optimized Prism.highlightAll
+// [+] bugfix: client scope to end (from begin) fixed
+// [+] bugfix: fix crash out of memory while scan binary files (add async logic)
+// 0.2.10 ]
 // 0.2.9 [
 // [+] type 'skip' bugfix
 // 0.2.9 ]
@@ -36,6 +41,7 @@
 // 0.2.8 ]
 // 0.2.7 [
 // [+] added sh pro
+// [+] shell scripts highlight
 // 0.2.7 ]
 // 0.2.6 [
 // [+] added acpu heartbeat animation
@@ -94,29 +100,7 @@ function LiveComment(options) {
 
   config = _.extend(config, options);
 
-  // IGNORE PATH [
-  var ignoreWatch = [];
-  var ignoreScan = [];
-
-  _.each(config, function(s, param) {
-    var keywords = param.split(' ');
-    if (keywords[0] == 'ignore')
-      for (var i = 1; i < keywords.length; i++) {
-
-        function addPath(dst, s) {
-          _.each(config.dirs, function(dir) {
-            var p = path.resolve(__dirname, dir, s);
-            dst.push(p);
-          });
-        }
-
-        if (keywords[i] == 'watch')
-          addPath(ignoreWatch, s);
-        if (keywords[i] == 'scan')
-          addPath(ignoreScan, s);
-      }
-  });
-  // IGNORE PATH ]
+  var dangerousCodeExecution = config.dangerousCodeExecution && config.dangerousCodeExecution.indexOf('server') != -1
 
   // CONFIG ]
 
@@ -132,7 +116,10 @@ function LiveComment(options) {
     paths: [__dirname+'/public/css', __dirname+'/public/js'],
     helperContext: app.locals
   }));
-
+  app.use(function(req, res, next){
+    res.locals.config = config;
+    next();
+  });
   function homeIndex(req, res) {
     res.render('home', {
       title: 'Home'
@@ -153,9 +140,9 @@ function LiveComment(options) {
 
   // WS SERVER [
 
-  console.log("✔ socket.io server listening on port %d", 8080);
+  console.log("✔ socket.io server listening on port %d", config.ws_port);
 
-  var io = require('socket.io').listen(8080);
+  var io = require('socket.io').listen(config.ws_port);
   io.sockets.on('connection', function (socket) {
 
     console.log('socket');
@@ -165,11 +152,17 @@ function LiveComment(options) {
 
     function sendState(socket) {
       var files = {};
+      var objects = {}
       _.each(storage.objects, function(o) {
-        buf = fs.readFileSync(o.name, "utf8");
-        files[o.name] = buf.split('\n');;
+        buf = fs.readFileSync(o.filename, "utf8");
+        objects[o.name] = {
+          name: o.name,
+          extlang: o.extlang,
+          objects: o.objects
+        }
+        files[o.name] = buf.split('\n');
       });
-      socket.json.send({'event': 'state', 'objects': storage.objects, 'files': files});
+      socket.json.send({'event': 'state', 'objects': objects, 'files': files});
     };
 
     sendState(socket);
@@ -179,12 +172,15 @@ function LiveComment(options) {
     });
 
     // NOTIFY CLIENTS [
-    storage.on('object.updated', function(obj) {
+    storage.on('object.updated', function(o) {
 
       io.sockets.sockets.forEach(function (socket) {
-//        console.log('send object', obj.name, 'to', socket.id);
-
-        var file = fs.readFileSync(obj.name, "utf8");
+        var file = fs.readFileSync(o.filename, "utf8");
+        var obj = {
+          name: o.name,
+          extlang: o.extlang,
+          objects: o.objects
+        }
         socket.json.send({'event': 'object.updated', 'object': obj, 'file': file});
       });
 
@@ -195,6 +191,228 @@ function LiveComment(options) {
 
   // WS SERVER ]
 
+  // OBJECT EXECUTOR [
+  function ObjectExecutor(options) {
+    if (!(this instanceof ObjectExecutor)) return new ObjectExecutor(options);
+    events.EventEmitter.call(this);
+
+    this.objects = {}
+    this.startup()
+    this.IsLivecomment = true
+    this.IsLivecommentServer = true
+    this.IsLivecommentClient = false
+  }
+  ObjectExecutor.prototype.__proto__ = events.EventEmitter.prototype;
+
+  // startup [
+  ObjectExecutor.prototype.startup = function startup() {
+    var self = this
+    this.test()
+    // boostrap [
+    this.object = {name:'SYS:::~~~23o4jwerfowe', events:[]}
+    this.onFrame('server.exec', '', 'frame', function() {
+      try
+      {
+        eval(self.data)
+      }
+      catch(e)
+      {
+        console.log('*** EVAL ERROR *** [')
+        console.log(e)
+        console.log('*** EVAL ERROR *** ]')
+      }
+    })
+    // boostrap ]
+  }
+  // startup ]
+
+  // callbacks [
+  ObjectExecutor.prototype.beforeSet = function beforeSet(object) {
+    // 3. return object
+    var listeners = this.listeners('beforeSet')
+    _.each(listeners, function (l) {
+      object = l(object)
+    })
+    return object
+  }
+  ObjectExecutor.prototype.mount = function mount(name) {
+    var o = this.objects[name]
+    if (o)
+      this.emitFrames(o.frames, 'mount', true)
+  }
+  ObjectExecutor.prototype.unmount = function unmount(name) {
+    var self = this
+    var o = this.objects[name]
+    if (o) {
+      this.emitFrames(o.frames, 'unmount', true)
+      _.each(o.events, function (ev) {
+        self.removeListener(ev[0], ev[1])
+      })
+    }
+    delete this.objects[name]
+  }
+  // callbacks ]
+
+  //
+  ObjectExecutor.prototype.setObject = function setObject(name) {
+    var object = {
+      name: name,
+      frames: [
+        ['this', name, undefined]
+      ],
+      events: []
+    }
+    this.objects[name] = object
+    this.object = object
+  }
+
+  // frame [
+  ObjectExecutor.prototype.frame = function frame(type, id, options) {
+    var frame = [type, id, options]
+    console.log('EXE.FRAME', frame)
+    this.object.frames.push(frame)
+    this.emitFrame(frame, 'frame')
+  }
+
+  ObjectExecutor.prototype.onFrame = function onFrame(type, id, events, cb) {
+    if (type == 'this')
+      id = this.object.name
+    var self = this
+    var evs = events.split('|')
+    evname = '['+type+']['+id+']'
+    _.each(evs, function (ev) {
+      var s = evname+'['+ev+']'
+      self.on(s, cb)
+      self.object.events.push([s, cb])
+      console.log('EXE.ONFRAME', s, typeof cb)
+    })
+  }
+  // frame ]
+
+  // test [
+  ObjectExecutor.prototype.test = function test() {
+/*    this.on('beforeSet', function (o) {
+      o.name = o.name+'TEST'
+      return o;
+    })
+    this.setObject('aaa')
+//    this.frame('test.css1')
+//    this.frame('test.css1', 'id1')
+    this.onFrame('this', '', 'mount|unmount', function (type, id, options) {
+      console.log('A', type, id, options)
+    })
+    this.onFrame('test.css1', '', 'frame|mount|unmount', function (type, id, options) {
+      console.log('B', type, id, options)
+    })
+    this.onFrame('test.css1', 'id1', 'frame|mount|unmount', function (type, id, options) {
+      console.log('C', type, id, options)
+    })
+    this.frame('test.css1')
+    this.frame('test.css1', 'id1')
+    this.mount('aaa')
+    this.unmount('aaa')
+    this.frame('test.css1')*/
+  }
+  // test ]
+
+  // emitFrame [
+  ObjectExecutor.prototype.emitFrame = function emitFrame(frame, event, mode) {
+    var self = this
+    function emit(a, b, c) {
+      var evname = '['+a+']['+b+']['+event+']'
+      console.log('EXE.EMIT', evname, c, self.object.name)
+      self.emit(evname, event, self.object.name, c)
+    }
+    var id = frame[1] === undefined ? '' : frame[1]
+    if (id !== '' && mode === undefined)
+      emit(frame[0], '', frame[2])      // all types
+    emit(frame[0], id, frame[2])  // specific type
+  }
+  // emitFrame ]
+  // emitFrames [
+  ObjectExecutor.prototype.emitFrames = function emitFrames(frames, event, mode) {
+    var self = this
+    _.each(frames, function (frame) {
+      self.emitFrame(frame, event, mode)
+    })
+  }
+  // emitFrames ]
+
+  // run [
+  ObjectExecutor.prototype.run = function run(code, data) {
+    console.log('EVAL [');
+    console.log('CODE [');
+    console.log(code);
+    console.log('CODE ]');
+    console.log('DATA [');
+    console.log(data);
+    console.log('DATA ]');
+    console.log('EVAL ]');
+//    eval('console.log(this)')
+//    var frame = this.frame
+    this.data = data
+    try
+    {
+      eval(code);
+    }
+    catch(e)
+    {
+      console.log('*** EVAL ERROR *** [')
+      console.log(e)
+      console.log('*** EVAL ERROR *** ]')
+    }
+  }
+  // run ]
+
+  // process [
+  ObjectExecutor.prototype.process = function process(object) {
+    var self = this
+    // 1. split to code:data
+    // 2. execute(code, data)
+    var comment = '//'
+    var commentLen = comment.length
+    var prefix = comment + ':='
+    var prefixLen = prefix.length
+    _.each(object.objects, function (o, key) {
+      var mode = 0
+      var code = ''
+      var data = ''
+      var begin = o.lines[0];
+      var end = o.lines[1]-1;
+      if (begin < end) {
+        var ss = object.lines.slice(begin, end);
+        for (var i in ss) {
+          var line = ss[i]
+          if (line.indexOf(prefix) == 0) {
+            var lineC = line.slice(prefixLen)
+            code += lineC + '\n'
+            continue;
+          }
+          if (mode == 0 && code !== '' && line.indexOf(comment) == 0)
+            mode = 1
+          if (mode == 1) {
+            if (line.indexOf(comment) == 0)
+              line = line.slice(commentLen)
+          } else
+            mode = 2
+
+          data += line + '\n'
+        }
+      }
+      executor.setObject(key)
+      if (code !== '')
+        self.run(code, data)
+      // mount [
+      executor.mount(key)
+      // mount ]
+    })
+  }
+  // process ]
+
+  var executor = new ObjectExecutor()
+
+  // OBJECT EXECUTOR ]
+
   // LIB READ LINES [
 
   var fs = require('fs');
@@ -202,20 +420,31 @@ function LiveComment(options) {
   function readLines(input, func) {
     var remaining = '';
 
-    input.on('data', function(data) {
-      remaining += data;
+    function process() {
       var index = remaining.indexOf('\n');
       while (index > -1) {
         var line = remaining.substring(0, index);
         remaining = remaining.substring(index + 1);
-        var res = func(line, false);
-        if (!res)
-          break;
+//        var res = func(line, false);
+//        if (!res)
+//          break;
+        func(line, false);
         index = remaining.indexOf('\n');
+//        console.log(index)
       }
+    }
+
+    input.on('data', function(data) {
+      remaining += data;
+
+      process()
     });
 
     input.on('end', function() {
+      if (remaining.length > 0) {
+//        func(remaining, false);
+        process()
+      }
       if (remaining.length > 0) {
         func(remaining, false);
       }
@@ -241,14 +470,33 @@ function LiveComment(options) {
 
     this.objects = {};
   }
-
   DataStorage.prototype.__proto__ = events.EventEmitter.prototype;
 
+  // set [
   DataStorage.prototype.set = function set(object) {
+    // code execution [
+    if (dangerousCodeExecution) {
+      // unmount [
+      var prev = this.objects[object.name]
+      prev && _.each(prev.objects, function (o, key) {
+        executor.unmount(key)
+      })
+      // unmount ]
+      // process [
+      executor.process(object)
+      // process ]
+
+      // beforeSet [
+      object = executor.beforeSet(object)
+      // beforeSet ]
+    }
+    // code execution ]
+
     this.objects[object.name] = object;
 
     this.emit('object.updated', object);
   }
+  // set ]
 
   // DataObject [
 
@@ -256,6 +504,7 @@ function LiveComment(options) {
     if (!(this instanceof DataObject)) return new DataObject(options);
 
     this.name = options.name;
+    this.filename = options.name;
     this.extlang = options.extlang;
     this.objects = {};
   }
@@ -299,6 +548,7 @@ function LiveComment(options) {
       console.log(filename, extlang);
 
       var obj = new DataObject({name: filename, extlang: extlang});
+      obj.lines = lines;
 
       for (var i in objects) {
         var o = objects[i];
@@ -343,7 +593,9 @@ function LiveComment(options) {
       lineN += 1;
 
       function checkCommentLine(stack, fileext, line, lineN, cbs) {
-        // TODO: really bad code. also refactor (for custom comment format) [
+
+        // custom comment format use config.extractCommentTagFromLine [
+
         function extractCommentTagFromLine(fileext, line) {
           line = line.trim();
           // CHECK FORMAT [
@@ -388,11 +640,13 @@ function LiveComment(options) {
           // SUPPORT FORMATS ]
           return false;
         }
-        // TODO: really bad code. also refactor (for custom comment format) ]
 
-        var tag = extractCommentTagFromLine(fileext, line);
+        var tag = (config.extractCommentTagFromLine && config.extractCommentTagFromLine(fileext, line)) || extractCommentTagFromLine(fileext, line);
         if (tag === null)
           return false;
+
+        // custom comment format use config.extractCommentTagFromLine ]
+
         if (tag) {
           // PROCESSING TAG [
           if (tag[1] == 0) {
@@ -435,11 +689,13 @@ function LiveComment(options) {
         return true;
       };
 
+      // complete [
       if (complete)
       {
         mergeChanges(filename, extlang, lines, objects);
         return true;
       }
+      // complete ]
 
       var res = checkCommentLine(stack, fileext, line, lineN, {
         begin: function(stack, c) {

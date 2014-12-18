@@ -4,6 +4,12 @@ console.log('main initialized');
 
 // EXE ]
 
+// CONFIG [
+
+var ws_port = $("meta[name='ws_port']").attr('content') || 8980;
+
+// CONFIG ]
+
 // TREE [
 
 function Tree() {
@@ -265,6 +271,24 @@ MainView.prototype.delegateEvents = function delegateEvents($el) {
 
 // delegateEvents ]
 
+// htmlString [
+// scope [
+function htmlStringScopeHeader(scope) {
+  return '<div class="scope" id="s-'+scope.uid+'" data-nodes="show" data-code="hide">' +
+    '<div class="scope-name">'+scope.name+'</div>'
+}
+// scope ]
+// node [
+function htmlStringNodeHeader(scope, node, k) {
+  var nodeName = node.uid || 's-'+scope.uid
+  var s = '<div class="node" id="n-'+nodeName+'" data-nodes="show" data-code="hide">'
+  if (k != 0)
+    s += '<div class="node-name" style="padding-left: '+k*10+'px;">'+node.name+' '+node.lines[0]+','+node.lines[1]+'</div>'
+  return s
+}
+// node ]
+// htmlString ]
+
 // UPDATE STATE [
 
 MainView.prototype.updateState = function updateState($el, objects, sources) {
@@ -282,9 +306,9 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
 
     scope.uid = calcMD5(scope.name);
 
-    s += '<div class="scope" id="s-'+scope.uid+'" data-nodes="show" data-code="hide">';
-    s += '<div class="scope-name">'+scope.name+'</div>';
-
+//    s += '<div class="scope" id="s-'+scope.uid+'" data-nodes="show" data-code="hide">';
+//    s += '<div class="scope-name">'+scope.name+'</div>';
+    s += htmlStringScopeHeader(scope)
 //    console.log(tree);
 
     function processLines(begin, end) {
@@ -308,14 +332,10 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
     }
 
     function processNode(node, k) {
-      var nodeName = node.uid || 's-'+scope.uid;
-      var s = '<div class="node" id="n-'+nodeName+'" data-nodes="show" data-code="hide">';
-
-      if (k != 0)
-        s += '<div class="node-name" style="padding-left: '+k*10+'px;">'+node.name+' '+node.lines[0]+','+node.lines[1]+'</div>';
+      var s = htmlStringNodeHeader(scope, node, k)
 
       var begin = 0,
-          end = 0;
+          end = sources[scope.name].length;
 
       if (node.lines) {
         begin = node.lines[0];
@@ -357,7 +377,12 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
     hljs.highlightBlock(block);
   });
 */
-  Prism.highlightAll();
+//  Prism.highlightAll();
+  var $codes = $el.find('code')
+  _.each($codes, function ($code) {
+    Prism.highlightElement($code);
+  })
+//  Prism.highlightElement($els);
 
   this.delegateEvents($el);
 };
@@ -372,12 +397,12 @@ MainView.prototype.updateStateObject = function updateStateObject(object, source
   var a = $('[id="s-'+object.uid+'"]');
 
   if (a.length == 0) {
-    a = this.$el.add( "div" ); //todo: not tested
-//    '<div class="scope" id="s-'+scope.uid+'">'
-//    a.addClass( "widget" );
+    this.$el.append(htmlStringScopeHeader(object))
+    a = $('[id="s-'+object.uid+'"]');
   }
-
-  this.updateState(a, [object], [source]);
+  var file = {}
+  file[object.name] = source.split('\n')
+  this.updateState(a, [object], file)
 };
 
 // UPDATE STATE OBJECT ]
@@ -389,7 +414,7 @@ $(document).ready(function onReady() {
   var mainView = new MainView();
 
   // WS CLIENT [
-  socket = io.connect(window.location.hostname+':8080');
+  socket = io.connect(window.location.hostname+':'+ws_port);
 
   socket.on('connect', function () {
 //  io.sockets.on('connection', function (socket) {

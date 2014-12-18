@@ -22,5 +22,6 @@ options.paths[__dirname+'/..'] = {
       /^\.idea.*/
     ]
 }
+options.paths['/path/to/finza'] = {}
 
 var livecomment = new LiveComment(options)
