@@ -4,6 +4,7 @@ var LiveComment = require('../livecomment')
 
 var options = {
     debug: 1,
+    dangerousCodeExecution: ['client', 'server'],
     common: {
       ignore: [
         '.git',

@@ -25,7 +25,7 @@
 // 0.2.10 [
 // [+] bugfix: scan break when remaining+'\n' > 0
 // [+] configure ws port
-// [ ] code execution client
+// [+] code execution client
 // [+] code execution server
 // [+] reconnect on each message bugfix: socket.io 1.2.0 updated
 // [+] tested: add onLoaded event at startup -> send event:'state'
@@ -102,6 +102,7 @@ function LiveComment(options) {
   config = _.extend(config, options);
 
   var dangerousCodeExecution = config.dangerousCodeExecution && config.dangerousCodeExecution.indexOf('server') != -1
+  config.clientCodeExecution = !!(config.dangerousCodeExecution && config.dangerousCodeExecution.indexOf('client') != -1)
 
   // CONFIG ]
 
@@ -144,6 +145,8 @@ function LiveComment(options) {
   console.log("✔ socket.io server listening on port %d", config.ws_port);
 
   var io = require('socket.io').listen(config.ws_port);
+
+  var socketNotifyOnObjectUpdateHookSetup = false
   io.sockets.on('connection', function (socket) {
 
     console.log('socket');
@@ -177,19 +180,34 @@ function LiveComment(options) {
     });
 
     // OBJECT UPDATE -> NOTIFY CLIENTS [
-    storage.on('object.updated', function(o) {
+    if (!socketNotifyOnObjectUpdateHookSetup) {
+      socketNotifyOnObjectUpdateHookSetup = false
+      storage.on('object.updated', function(o) {
 
-      io.sockets.sockets.forEach(function (socket) {
-        var file = fs.readFileSync(o.filename, "utf8");
-        var obj = {
-          name: o.name,
-          extlang: o.extlang,
-          objects: o.objects
-        }
-        socket.json.send({'event': 'object.updated', 'object': obj, 'file': file});
-      });
+        io.sockets.sockets.forEach(function (socket) {
+          var file = fs.readFileSync(o.filename, "utf8");
+          var obj = {
+            name: o.name,
+            extlang: o.extlang,
+            objects: o.objects
+          }
+          // hotfix: mulitple send same file - use socket-hash [
 
-    })
+          var hash = md5(file)
+          socket.__lcFileCS = socket.__lcFileCS || {}
+          if (!socket.__lcFileCS[hash]) {
+            socket.__lcFileCS[hash] = true
+            socket.json.send({'event': 'object.updated', 'object': obj, 'file': file});
+          }
+          else {
+            console.log("duplicate "+ o.name)
+          }
+
+          // hotfix: mulitple send same file - use socket-hash ]
+        });
+
+      })
+    }
     // OBJECT UPDATE -> NOTIFY CLIENTS ]
 
   });
@@ -217,7 +235,9 @@ function LiveComment(options) {
     var self = this
     this.test()
     // boostrap [
+    // ??? [
     this.object = {name:'SYS:::~~~23o4jwerfowe', events:[]}
+    // ??? ]
     // hook frame('server.exec') [
     this.onFrame('server.exec', '', 'frame', function() {
       try
@@ -237,7 +257,7 @@ function LiveComment(options) {
   // startup ]
 
   // callbacks [
-  // beforeSet [
+  // beforeSet - hook. can modify object. todo: use common proto.hook [
 
   ObjectExecutor.prototype.beforeSet = function beforeSet(object) {
     // 3. return object
@@ -248,7 +268,7 @@ function LiveComment(options) {
     return object
   }
 
-  // beforeSet ]
+  // beforeSet - hook. can modify object. todo: use common proto.hook ]
   // mount [
 
   ObjectExecutor.prototype.mount = function mount(name) {
@@ -392,12 +412,12 @@ function LiveComment(options) {
   // process [
   ObjectExecutor.prototype.process = function process(object) {
     var self = this
-    // 1. split to code:data [
     var comment = '//'
     var commentLen = comment.length
     var prefix = comment + ':='
     var prefixLen = prefix.length
     _.each(object.objects, function (o, key) {
+      // 1. split to code:data [
       var mode = 0
       var code = ''
       var data = ''

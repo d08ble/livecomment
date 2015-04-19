@@ -7,6 +7,7 @@ console.log('main initialized');
 // CONFIG [
 
 var ws_port = $("meta[name='ws_port']").attr('content') || 8980;
+var codeExecution = $("meta[name='code_execution']").attr('content');
 
 // CONFIG ]
 
@@ -177,6 +178,8 @@ function MainView() {
   };
   // STATE ]
 
+  this.scopes = {}
+
 };
 
 function transformObjectToTree(tree, path, object) {
@@ -293,9 +296,35 @@ function htmlStringNodeHeader(scope, node, k) {
 
 MainView.prototype.updateState = function updateState($el, objects, sources) {
 //  console.log(objects, sources);
-  var s = '';
+  var s = ''
+  var s_
+  var self = this
 
+  // objects -> [
   _.each(objects, function(scope) {
+
+    if (codeExecution == "true") {
+      // 1. unmount prev scope [
+      var prev = self.scopes[scope.name]
+      prev && _.each(prev, function (o, key) {
+        executor.unmount(key)
+      })
+      // 1. unmount prev scope ]
+
+      // 2. process [
+      executor.process(scope, sources)
+      // 2. process ]
+    }
+
+    // update scope keys [
+    var keys = {}
+    _.each(scope.objects, function(object, name) {
+      keys[name] = true
+    })
+    self.scopes[scope.name] = keys
+    // update scope keys ]
+
+//  }
     var tree = new Tree();
 
     // MAKE TREE [
@@ -306,9 +335,12 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
 
     scope.uid = calcMD5(scope.name);
 
-//    s += '<div class="scope" id="s-'+scope.uid+'" data-nodes="show" data-code="hide">';
-//    s += '<div class="scope-name">'+scope.name+'</div>';
-    s += htmlStringScopeHeader(scope)
+    // EXECUTOR.HOOK: afterScopeHeader [
+    s_ = htmlStringScopeHeader(scope)
+    s_ = executor.hook('afterScopeHeader', s_, scope)
+    s += s_
+    // EXECUTOR.HOOK: afterScopeHeader ]
+
 //    console.log(tree);
 
     function processLines(begin, end) {
@@ -332,7 +364,12 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
     }
 
     function processNode(node, k) {
-      var s = htmlStringNodeHeader(scope, node, k)
+      var s
+      // EXECUTOR.HOOK: afterNodeHeader [
+      s_ = htmlStringNodeHeader(scope, node, k)
+      s_ = executor.hook('afterNodeHeader', s_, [scope, node, k])
+      s = s_
+      // EXECUTOR.HOOK: afterNodeHeader ]
 
       var begin = 0,
           end = sources[scope.name].length;
@@ -345,7 +382,11 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
         var beginC = child.lines[0],
             endC = child.lines[1];
 
-        s += processLines(begin, beginC);
+      // EXECUTOR.HOOK: afterProcessLines [
+      s_ = processLines(begin, beginC);
+      s_ = executor.hook('afterProcessLines', s_, [sources, scope, begin, beginC])
+      s += s_
+      // EXECUTOR.HOOK: afterProcessLines ]
 
         s += processNode(child, k+1);
 
@@ -362,13 +403,12 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
     s += '</div>';
 
   });
+  // objects -> ]
 
-/*  _.each(objects, function(scope) {
-    s += scope.name+'<br>';
-    _.each(scope.objects, function(object, name) {
-//      s += name+'<br>';
-    });
-  });*/
+  // EXECUTOR.HOOK: afterProcessObjects [
+  s = executor.hook('afterProcessObjects', s, objects)
+  // EXECUTOR.HOOK: afterProcessObjects ]
+
   $el.html(s);
 
   restoreHideShow($el.find('.node'));
@@ -385,9 +425,14 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
 //  Prism.highlightElement($els);
 
   this.delegateEvents($el);
+
+  // EXECUTOR.HOOK: afterElementUpdate [
+  executor.hook('afterElementUpdate', $el)
+  // EXECUTOR.HOOK: afterElementUpdate ]
 };
 
 // UPDATE STATE ]
+
 
 // UPDATE STATE OBJECT [
 
@@ -417,7 +462,6 @@ $(document).ready(function onReady() {
   socket = io.connect(window.location.hostname+':'+ws_port);
 
   socket.on('connect', function () {
-//  io.sockets.on('connection', function (socket) {
     console.log('io.connected');
 
     socket.on('message', function (msg) {
@@ -496,6 +540,7 @@ if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) |
 }
 // iPad label click bugfix ]
 
+// removed [
 // LIB ESCAPE [
 /*** not tested
  (function() {
@@ -535,3 +580,16 @@ if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) |
  */
 // LIB ESCAPE ]
 
+//    s += '<div class="scope" id="s-'+scope.uid+'" data-nodes="show" data-code="hide">';
+//    s += '<div class="scope-name">'+scope.name+'</div>';
+
+/*  _.each(objects, function(scope) {
+    s += scope.name+'<br>';
+    _.each(scope.objects, function(object, name) {
+//      s += name+'<br>';
+    });
+  });*/
+
+//  io.sockets.on('connection', function (socket) {
+
+// removed ]
