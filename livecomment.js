@@ -148,9 +148,12 @@ function LiveComment(options) {
 
     console.log('socket');
 
+    // SEND CONNECTED [
     var time = (new Date).toLocaleTimeString();
     socket.json.send({'event': 'connected', 'time': time});
+    // SEND CONNECTED ]
 
+    // SEND INITIAL STATE - todo: client should require hash list [
     function sendState(socket) {
       var files = {};
       var objects = {}
@@ -167,12 +170,13 @@ function LiveComment(options) {
     };
 
     sendState(socket);
+    // SEND INITIAL STATE - todo: client should require hash list ]
 
     socket.on('message', function (msg) {
       conslole.log('msg:', msg);
     });
 
-    // NOTIFY CLIENTS [
+    // OBJECT UPDATE -> NOTIFY CLIENTS [
     storage.on('object.updated', function(o) {
 
       io.sockets.sockets.forEach(function (socket) {
@@ -186,13 +190,15 @@ function LiveComment(options) {
       });
 
     })
-    // NOTIFY CLIENTS ]
+    // OBJECT UPDATE -> NOTIFY CLIENTS ]
 
   });
 
   // WS SERVER ]
 
   // OBJECT EXECUTOR [
+
+  // constructor [
   function ObjectExecutor(options) {
     if (!(this instanceof ObjectExecutor)) return new ObjectExecutor(options);
     events.EventEmitter.call(this);
@@ -204,6 +210,7 @@ function LiveComment(options) {
     this.IsLivecommentClient = false
   }
   ObjectExecutor.prototype.__proto__ = events.EventEmitter.prototype;
+  // constructor ]
 
   // startup [
   ObjectExecutor.prototype.startup = function startup() {
@@ -211,6 +218,7 @@ function LiveComment(options) {
     this.test()
     // boostrap [
     this.object = {name:'SYS:::~~~23o4jwerfowe', events:[]}
+    // hook frame('server.exec') [
     this.onFrame('server.exec', '', 'frame', function() {
       try
       {
@@ -223,11 +231,14 @@ function LiveComment(options) {
         console.log('*** EVAL ERROR *** ]')
       }
     })
+    // hook frame('server.exec') ]
     // boostrap ]
   }
   // startup ]
 
   // callbacks [
+  // beforeSet [
+
   ObjectExecutor.prototype.beforeSet = function beforeSet(object) {
     // 3. return object
     var listeners = this.listeners('beforeSet')
@@ -236,11 +247,19 @@ function LiveComment(options) {
     })
     return object
   }
+
+  // beforeSet ]
+  // mount [
+
   ObjectExecutor.prototype.mount = function mount(name) {
     var o = this.objects[name]
     if (o)
       this.emitFrames(o.frames, 'mount', true)
   }
+
+  // mount ]
+  // unmount [
+
   ObjectExecutor.prototype.unmount = function unmount(name) {
     var self = this
     var o = this.objects[name]
@@ -252,9 +271,11 @@ function LiveComment(options) {
     }
     delete this.objects[name]
   }
+
+  // unmount ]
   // callbacks ]
 
-  //
+  // setObject [
   ObjectExecutor.prototype.setObject = function setObject(name) {
     var object = {
       name: name,
@@ -266,15 +287,18 @@ function LiveComment(options) {
     this.objects[name] = object
     this.object = object
   }
+  // setObject ]
 
-  // frame [
+  // frame - PLUGIN SHARED [
   ObjectExecutor.prototype.frame = function frame(type, id, options) {
     var frame = [type, id, options]
     console.log('EXE.FRAME', frame)
     this.object.frames.push(frame)
     this.emitFrame(frame, 'frame')
   }
+  // frame - PLUGIN SHARED ]
 
+  // onFrame - PLUGIN SHARED [
   ObjectExecutor.prototype.onFrame = function onFrame(type, id, events, cb) {
     if (type == 'this')
       id = this.object.name
@@ -288,7 +312,7 @@ function LiveComment(options) {
       console.log('EXE.ONFRAME', s, typeof cb)
     })
   }
-  // frame ]
+  // onFrame - PLUGIN SHARED ]
 
   // test [
   ObjectExecutor.prototype.test = function test() {
@@ -368,8 +392,7 @@ function LiveComment(options) {
   // process [
   ObjectExecutor.prototype.process = function process(object) {
     var self = this
-    // 1. split to code:data
-    // 2. execute(code, data)
+    // 1. split to code:data [
     var comment = '//'
     var commentLen = comment.length
     var prefix = comment + ':='
@@ -400,12 +423,25 @@ function LiveComment(options) {
           data += line + '\n'
         }
       }
+      // 1. split to code:data ]
+
+      // 2. update [
       executor.setObject(key)
+      // 2. update ]
+
+      // 3. code execution [
+      // execute(code, data) [
+
       if (code !== '')
         self.run(code, data)
+
+      // execute(code, data) ]
       // mount [
+
       executor.mount(key)
+
       // mount ]
+      // 3. code execution ]
     })
   }
   // process ]
@@ -477,23 +513,25 @@ function LiveComment(options) {
   DataStorage.prototype.set = function set(object) {
     // code execution [
     if (dangerousCodeExecution) {
-      // unmount [
+      // 1. unmount [
       var prev = this.objects[object.name]
       prev && _.each(prev.objects, function (o, key) {
         executor.unmount(key)
       })
-      // unmount ]
-      // process [
+      // 1. unmount ]
+      // 2. process [
       executor.process(object)
-      // process ]
+      // 2. process ]
 
-      // beforeSet [
+      // 3. before SetObject [
       object = executor.beforeSet(object)
-      // beforeSet ]
+      // 3. before SetObject ]
     }
     // code execution ]
 
+    // SetObject [
     this.objects[object.name] = object;
+    // SetObject ]
 
     this.emit('object.updated', object);
   }
