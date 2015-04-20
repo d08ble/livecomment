@@ -18,11 +18,11 @@
 //     * TAG [
 //     *  two
 //     * TAG ]
-// [ ] multiple node instanses not configure ws 8080 port
 // KNOWN BUGS ]
 
 // SOLVED [
 // 0.2.10 [
+// [+] speed up networking
 // [+] bugfix: scan break when remaining+'\n' > 0
 // [+] configure ws port
 // [+] code execution client
@@ -235,9 +235,9 @@ function LiveComment(options) {
     var self = this
     this.test()
     // boostrap [
-    // ??? [
+    // onFrame require this.object [
     this.object = {name:'SYS:::~~~23o4jwerfowe', events:[]}
-    // ??? ]
+    // onFrame require this.object ]
     // hook frame('server.exec') [
     this.onFrame('server.exec', '', 'frame', function() {
       try

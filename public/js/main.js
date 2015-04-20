@@ -360,6 +360,10 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
         }
 //          s += '<pre style="padding-left: 50px;"><code>'+lines.join('\n')+'</code></pre>'
       }
+      // EXECUTOR.HOOK: afterProcessLines [
+      s = executor.hook('afterProcessLines', s, [sources, scope, begin, end])
+      // EXECUTOR.HOOK: afterProcessLines ]
+
       return s;
     }
 
@@ -382,11 +386,7 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
         var beginC = child.lines[0],
             endC = child.lines[1];
 
-      // EXECUTOR.HOOK: afterProcessLines [
-      s_ = processLines(begin, beginC);
-      s_ = executor.hook('afterProcessLines', s_, [sources, scope, begin, beginC])
-      s += s_
-      // EXECUTOR.HOOK: afterProcessLines ]
+        s += processLines(begin, beginC);
 
         s += processNode(child, k+1);
 

@@ -273,7 +273,7 @@ ObjectExecutor.prototype.hook = function hook(name, object, params) {
 
 /* FORMAT 2 - as multiline comments with highlight (language depence)
 //: 2. client hooks [
-//:= this.frame('client.exec')
+//: = this.frame('client.exec')
 
   console.log("<LIVECOMMENT NOTYIFY> setup hooks")
 
@@ -303,6 +303,109 @@ ObjectExecutor.prototype.hook = function hook(name, object, params) {
 /*
 //: 3. test css [
 //:= this.frame('client.exec')
-$("<style type='text/css'> #menu { background-color:#369;} </style>").appendTo("head");
+$("<style type='text/css'> #menu { background-color:#36E;} </style>").appendTo("head");
 //: 3. test css ]
+*/
+
+/*
+//: 4. test editor [
+//:= this.frame('client.exec')
+
+$("<style type='text/css' media='screen' id='ace-editor-css'> #ace-editor-view {"+
+"        margin: 70px;"+
+"        position: fixed;"+
+"        top: 0;"+
+"        bottom: 0;"+
+"        left: 0;"+
+"        right: 0;"+
+//"background-color: #212;"+
+"background-color: #fff;"+
+"z-index: 10;"+
+//" box-shadow: 0 0 10px rgba(0,0,0,0.5); "+
+"-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);"+
+"-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);"+
+"box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);"+
+"    }"+
+"#ace-editor {width:100%;height:calc(100% - 50px);}"+
+"#ace-editor-menu {"+
+"background-color:#36E;"+
+"}"+
+"#ace-button-cancel {"+
+"  margin: 10px;"+
+"  color: #333;"+
+"  background-color: #c24;"+
+"  border: 0.1em solid #545454;"+
+"  border-radius: 4px;"+
+"  padding: 6px 12px;"+
+"}"+
+"#ace-button-apply {"+
+"  margin: 10px;"+
+"  color: #333;"+
+"  background-color: #2c4;"+
+"  border: 0.1em solid #545454;"+
+"  border-radius: 4px;"+
+"  padding: 6px 12px;"+
+"float:right;"+
+"}"+
+"</style>").appendTo('head')
+
+if (1 || !window.__ace_loaded) {
+  window.__ace_loaded = true
+
+  $("#ace-editor-view").remove()
+
+  window.__ace_onClose = function () {
+    $('#ace-editor-view').hide()
+  }
+
+  $("<div id='ace-editor-view'>"+
+    "<div id='ace-editor-menu'>"+
+    "<button id='ace-button-cancel' onclick='window.__ace_onClose()'>X</button>"+
+    "<button id='ace-button-apply'>Apply</button></div>"+
+    "<pre id='ace-editor'>TEXT</pre><div>"
+  ).appendTo('body')
+
+//  var editor
+
+  $.ajax({
+    url: "https://cdn.rawgit.com/ajaxorg/ace-builds/master/src-noconflict/ace.js",
+  //  url: "https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-noconflict/ace.js",
+  //  url: "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.js",
+    dataType: "script",
+    success: function () {
+      editor = ace.edit("ace-editor")
+      editor.setTheme("ace/theme/twilight")
+      editor.getSession().setMode("ace/mode/javascript")
+    }
+  });
+
+  window.__ace_onEdit = function (a) {
+    $('#ace-editor-view').show()
+    editor.setValue($(a).html())
+//    console.log($(a).html())
+  }
+
+if (0) {
+  var $mw = $('#main-view')
+  var $ps = $('pre') //$.find('pre')
+  console.log($ps)
+  $('pre').click(function(){
+    alert('a')
+//    window.__ace_editor
+//    $('#ace-editor-view').show()
+  })
+}
+
+
+  this.onEvent('afterProcessLines', function (o, params) {
+    var msg = 'qwerty'
+    o = o.replace("<pre ", "<pre onclick='window.__ace_onEdit(this)'")
+//    console.log('<LIVECOMMENT NOTYIFY> afterProcessLines 1', o)
+    return o
+  })
+
+  $('#ace-editor-view').hide()
+}
+
+//: 4. test editor ]
 */
