@@ -344,12 +344,13 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
 //    console.log(tree);
 
     function processLines(begin, end) {
+      var lines = ''
       var s = '';
       end -= 1;
       if (begin < end) {
 //        console.log(begin, end);
         var src = sources[scope.name];
-        var lines = src.slice(begin, end);
+        lines = src.slice(begin, end);
         while (lines.length > 0 && lines[0] == '')
           lines = lines.slice(1, lines.length);
         if (lines.length > 0) // && !(lines.length == 1 && lines[0] == ''))
@@ -361,7 +362,7 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
 //          s += '<pre style="padding-left: 50px;"><code>'+lines.join('\n')+'</code></pre>'
       }
       // EXECUTOR.HOOK: afterProcessLines [
-      s = executor.hook('afterProcessLines', s, [sources, scope, begin, end])
+      s = executor.hook('afterProcessLines', s, [sources, scope, begin, end, lines])
       // EXECUTOR.HOOK: afterProcessLines ]
 
       return s;

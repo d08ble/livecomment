@@ -349,7 +349,7 @@ $("<style type='text/css' media='screen' id='ace-editor-css'> #ace-editor-view {
 "}"+
 "</style>").appendTo('head')
 
-if (1 || !window.__ace_loaded) {
+if (!window.__ace_loaded) {
   window.__ace_loaded = true
 
   $("#ace-editor-view").remove()
@@ -365,12 +365,10 @@ if (1 || !window.__ace_loaded) {
     "<pre id='ace-editor'>TEXT</pre><div>"
   ).appendTo('body')
 
-//  var editor
+  var editor
 
   $.ajax({
     url: "https://cdn.rawgit.com/ajaxorg/ace-builds/master/src-noconflict/ace.js",
-  //  url: "https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-noconflict/ace.js",
-  //  url: "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.js",
     dataType: "script",
     success: function () {
       editor = ace.edit("ace-editor")
@@ -381,10 +379,32 @@ if (1 || !window.__ace_loaded) {
 
   window.__ace_onEdit = function (a) {
     $('#ace-editor-view').show()
-    editor.setValue($(a).html())
-//    console.log($(a).html())
+    var s = $(a).html().replace(/(<([^>]+)>)/ig , "")
+    console.log(s)
+    editor.setValue(s)
   }
 
+  this.onEvent('afterProcessLines', function (o, params) {
+//    var lines = params[4]
+//    console.log(lines)
+    o = o.replace("<pre ", "<pre onclick='window.__ace_onEdit(this)'")
+    return o
+  })
+
+  $('#ace-editor-view').hide()
+}
+
+//: 4. test editor ]
+
+*/
+
+
+
+
+  //  url: "https://raw.githubusercontent.com/ajaxorg/ace-builds/master/src-noconflict/ace.js",
+  //  url: "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.js",
+//    console.log($(a).html())
+/*
 if (0) {
   var $mw = $('#main-view')
   var $ps = $('pre') //$.find('pre')
@@ -395,17 +415,7 @@ if (0) {
 //    $('#ace-editor-view').show()
   })
 }
-
-
-  this.onEvent('afterProcessLines', function (o, params) {
-    var msg = 'qwerty'
-    o = o.replace("<pre ", "<pre onclick='window.__ace_onEdit(this)'")
-//    console.log('<LIVECOMMENT NOTYIFY> afterProcessLines 1', o)
-    return o
-  })
-
-  $('#ace-editor-view').hide()
-}
-
-//: 4. test editor ]
 */
+//    console.log('<LIVECOMMENT NOTYIFY> afterProcessLines 1', o)
+
+
