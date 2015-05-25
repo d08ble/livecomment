@@ -26,5 +26,11 @@ module.exports = {
     'pro': 'c',
     'sh': 'c'
   },
+
+  noLogging: [
+    'watch.skip'
+//    'watch.scan'
+//    'emit'
+  ]
 };
 // DEFAULT CONFIG ]

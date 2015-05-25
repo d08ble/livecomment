@@ -22,6 +22,9 @@
 
 // SOLVED [
 // 0.2.10 [
+// [ ] noLogging execution
+// [ ] noLogging emit
+// [+] config.noLogging watch.<type> added
 // [+] disable process.PORT, use config.port
 // [+] speed up networking
 // [+] bugfix: scan break when remaining+'\n' > 0
@@ -793,7 +796,8 @@ function LiveComment(options) {
   // SCANWATCH [
 
   scanwatch.setup(options, function (type, file) {
-    console.log(type, file)
+    if (!(config.noLogging && config.noLogging.indexOf('watch.'+type) != -1))
+      console.log(type, file)
     if (type != 'skip' && fs.existsSync(file) && !fs.lstatSync(file).isDirectory()) {
       analyze(file)
     }
