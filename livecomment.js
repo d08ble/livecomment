@@ -22,6 +22,7 @@
 
 // SOLVED [
 // 0.2.10 [
+// [+] disable process.PORT, use config.port
 // [+] speed up networking
 // [+] bugfix: scan break when remaining+'\n' > 0
 // [+] configure ws port
@@ -110,7 +111,7 @@ function LiveComment(options) {
 
   var app = express();
 
-  app.set('port', process.env.PORT || config.port);
+  app.set('port', config.port);
 
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
