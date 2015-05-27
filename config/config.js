@@ -32,5 +32,7 @@ module.exports = {
 //    'watch.scan'
 //    'emit'
   ]
+
+//  hooks.beforeSet: function beforeSet(o) {return o;},
 };
 // DEFAULT CONFIG ]

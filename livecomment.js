@@ -22,6 +22,7 @@
 
 // SOLVED [
 // 0.2.10 [
+// [+] hook beforeSet
 // [ ] noLogging execution
 // [ ] noLogging emit
 // [+] config.noLogging watch.<type> added
@@ -165,13 +166,13 @@ function LiveComment(options) {
       var files = {};
       var objects = {}
       _.each(storage.objects, function(o) {
-        buf = fs.readFileSync(o.filename, "utf8");
+//        var buf = fs.readFileSync(o.filename, "utf8");
         objects[o.name] = {
           name: o.name,
           extlang: o.extlang,
           objects: o.objects
         }
-        files[o.name] = buf.split('\n');
+        files[o.name] = o.lines //buf.split('\n');
       });
       socket.json.send({'event': 'state', 'objects': objects, 'files': files});
     };
@@ -189,12 +190,13 @@ function LiveComment(options) {
       storage.on('object.updated', function(o) {
 
         io.sockets.sockets.forEach(function (socket) {
-          var file = fs.readFileSync(o.filename, "utf8");
+          //var file = fs.readFileSync(o.filename, "utf8");
           var obj = {
             name: o.name,
             extlang: o.extlang,
             objects: o.objects
           }
+          var file = o.lines.join('\n')
           // hotfix: mulitple send same file - use socket-hash [
 
           var hash = md5(file)
@@ -262,7 +264,7 @@ function LiveComment(options) {
 
   // callbacks [
   // beforeSet - hook. can modify object. todo: use common proto.hook [
-
+/*
   ObjectExecutor.prototype.beforeSet = function beforeSet(object) {
     // 3. return object
     var listeners = this.listeners('beforeSet')
@@ -271,7 +273,7 @@ function LiveComment(options) {
     })
     return object
   }
-
+*/
   // beforeSet - hook. can modify object. todo: use common proto.hook ]
   // mount [
 
@@ -548,7 +550,8 @@ function LiveComment(options) {
       // 2. process ]
 
       // 3. before SetObject [
-      object = executor.beforeSet(object)
+//      object = executor.beforeSet(object)
+      object = (options.hooks && options.hooks.beforeSet !== undefined) ? options.hooks.beforeSet(object) : object
       // 3. before SetObject ]
     }
     // code execution ]
