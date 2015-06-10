@@ -21,7 +21,7 @@
     "less": "^1.7.3",
     "socket.io": "1.2.0",
     "MD5": "^1.2.1",
-    "scanwatch": "^0.1.1"
+    "scanwatch": "^0.1.2"
   },
   "devDependencies": {},
   "optionalDependencies": {},
