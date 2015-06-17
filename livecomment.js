@@ -23,8 +23,7 @@
 // SOLVED [
 // 0.2.10 [
 // [+] hook beforeSet
-// [ ] noLogging execution
-// [ ] noLogging emit
+// [+] noLogging server watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, run.eval
 // [+] config.noLogging watch.<type> added
 // [+] disable process.PORT, use config.port
 // [+] speed up networking
@@ -109,6 +108,10 @@ function LiveComment(options) {
   var dangerousCodeExecution = config.dangerousCodeExecution && config.dangerousCodeExecution.indexOf('server') != -1
   config.clientCodeExecution = !!(config.dangerousCodeExecution && config.dangerousCodeExecution.indexOf('client') != -1)
 
+  function isLogging(s) {
+    return !(config.noLogging && config.noLogging.indexOf(s) != -1)
+  }
+
   // CONFIG ]
 
   // HTTP SERVER [
@@ -154,7 +157,7 @@ function LiveComment(options) {
   var socketNotifyOnObjectUpdateHookSetup = false
   io.sockets.on('connection', function (socket) {
 
-    console.log('socket');
+    console.log('Client', socket.handshake.address);
 
     // SEND CONNECTED [
     var time = (new Date).toLocaleTimeString();
@@ -318,7 +321,8 @@ function LiveComment(options) {
   // frame - PLUGIN SHARED [
   ObjectExecutor.prototype.frame = function frame(type, id, options) {
     var frame = [type, id, options]
-    console.log('EXE.FRAME', frame)
+    if (isLogging('exe.frame'))
+      console.log('EXE.FRAME', frame)
     this.object.frames.push(frame)
     this.emitFrame(frame, 'frame')
   }
@@ -371,7 +375,8 @@ function LiveComment(options) {
     var self = this
     function emit(a, b, c) {
       var evname = '['+a+']['+b+']['+event+']'
-      console.log('EXE.EMIT', evname, c, self.object.name)
+      if (isLogging('exe.emit'))
+        console.log('EXE.EMIT', evname, c, self.object.name)
       self.emit(evname, event, self.object.name, c)
     }
     var id = frame[1] === undefined ? '' : frame[1]
@@ -391,14 +396,16 @@ function LiveComment(options) {
 
   // run [
   ObjectExecutor.prototype.run = function run(code, data) {
-    console.log('EVAL [');
-    console.log('CODE [');
-    console.log(code);
-    console.log('CODE ]');
-    console.log('DATA [');
-    console.log(data);
-    console.log('DATA ]');
-    console.log('EVAL ]');
+    if (isLogging('run.eval')) {
+      console.log('EVAL [');
+      console.log('CODE [');
+      console.log(code);
+      console.log('CODE ]');
+      console.log('DATA [');
+      console.log(data);
+      console.log('DATA ]');
+      console.log('EVAL ]');
+    }
 //    eval('console.log(this)')
 //    var frame = this.frame
     this.data = data
@@ -590,7 +597,7 @@ function LiveComment(options) {
       }
       s += objectToStr(o);
 
-      console.log(s);
+//      console.log(s);
       return s;
     }
     var path = toStrPath(o);
@@ -768,7 +775,8 @@ function LiveComment(options) {
         },
         end: function(stack, c) {
   //        udb.add(c);
-          console.log(c);
+          if (isLogging('object.parsed'))
+            console.log(c);
           objects.push(c);
         },
         error: function(msg) {
@@ -799,7 +807,7 @@ function LiveComment(options) {
   // SCANWATCH [
 
   scanwatch.setup(options, function (type, file) {
-    if (!(config.noLogging && config.noLogging.indexOf('watch.'+type) != -1))
+    if (isLogging('watch.'+type))
       console.log(type, file)
     if (type != 'skip' && fs.existsSync(file) && !fs.lstatSync(file).isDirectory()) {
       analyze(file)

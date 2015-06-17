@@ -16,6 +16,15 @@ var options = {
 //        /\/node_modules.*/
       ]
     },
+    noLogging: [
+      'watch.skip',
+      'watch.scan',
+      'object.parsed',
+//      'exe.emit',
+//      'exe.frame',
+      'run.eval'
+    ],
+
     paths: {}
 }
 options.paths[__dirname+'/..'] = {

@@ -28,9 +28,12 @@ module.exports = {
   },
 
   noLogging: [
-    'watch.skip'
-//    'watch.scan'
-//    'emit'
+    'watch.skip',
+    'watch.scan',
+    'object.parsed',
+    'exe.emit',
+    'exe.frame',
+    'run.eval'
   ]
 
 //  hooks.beforeSet: function beforeSet(o) {return o;},
