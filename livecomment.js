@@ -8,20 +8,24 @@
 // https://www.npmjs.org/package/livecomment
 // URL NPM ]
 
-
 // KNOWN BUGS [
-// [ ] experiment code. code review required
-// [ ] multiple tags split, demo:
+// || multiple tags split, demo:
 //     * TAG [
 //     *  one
 //     * TAG ]
 //     * TAG [
 //     *  two
 //     * TAG ]
+// || scanwatch ignore multiple +subdirs
+// || delete file
+// || lazy update
 // KNOWN BUGS ]
 
 // SOLVED [
 // 0.2.10 [
+// [+] bugfix objname __lcFileCS hash checking
+// [+] client htmlEscape fix
+// [+] plugins/0 added
 // [+] fix analyze sequence queue
 // [+] hook beforeSet
 // [+] noLogging server watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, exe.onframe, run.eval
@@ -205,8 +209,8 @@ function LiveComment(options) {
 
           var hash = md5(file)
           socket.__lcFileCS = socket.__lcFileCS || {}
-          if (!socket.__lcFileCS[hash]) {
-            socket.__lcFileCS[hash] = true
+          if (!(socket.__lcFileCS[obj.name] && socket.__lcFileCS[obj.name] == hash)) {
+            socket.__lcFileCS[obj.name] = hash
             socket.json.send({'event': 'object.updated', 'object': obj, 'file': file});
           }
           else {
@@ -840,6 +844,12 @@ function LiveComment(options) {
   })
 
   // SCANWATCH ]
+
+  // dbgbrk [
+  ObjectExecutor.prototype.dbgbrk = function(s) {
+    console.log('dbgbrk', s)
+  }
+  // dbgbrk ]
 
 };
 

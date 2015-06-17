@@ -275,6 +275,16 @@ MainView.prototype.delegateEvents = function delegateEvents($el) {
 // delegateEvents ]
 
 // htmlString [
+// htmlEscape [
+function htmlEscape(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+// htmlEscape ]
 // scope [
 function htmlStringScopeHeader(scope) {
   return '<div class="scope" id="s-'+scope.uid+'" data-nodes="show" data-code="hide">' +
@@ -284,9 +294,9 @@ function htmlStringScopeHeader(scope) {
 // node [
 function htmlStringNodeHeader(scope, node, k) {
   var nodeName = node.uid || 's-'+scope.uid
-  var s = '<div class="node" id="n-'+nodeName+'" data-nodes="show" data-code="hide">'
+  var s = '<div class="node" id="n-'+htmlEscape(nodeName)+'" data-nodes="show" data-code="hide">'
   if (k != 0)
-    s += '<div class="node-name" style="padding-left: '+k*10+'px;">'+node.name+' '+node.lines[0]+','+node.lines[1]+'</div>'
+    s += '<div class="node-name" style="padding-left: '+k*10+'px;">'+htmlEscape(node.name)+' '+node.lines[0]+','+node.lines[1]+'</div>'
   return s
 }
 // node ]
@@ -356,8 +366,8 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
         if (lines.length > 0) // && !(lines.length == 1 && lines[0] == ''))
         {
           var s1 = lines.join('\n');
-          s1 = s1.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
-          s += '<pre style="padding-left: 50px; display: none;"><code  class="language-'+scope.extlang+'" data-nodes="show" data-code="hide">'+s1+'</code></pre>' //prism
+//          s1 = s1.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+          s += '<pre style="padding-left: 50px; display: none;"><code  class="language-'+scope.extlang+'" data-nodes="show" data-code="hide">'+htmlEscape(s1)+'</code></pre>' //prism
         }
 //          s += '<pre style="padding-left: 50px;"><code>'+lines.join('\n')+'</code></pre>'
       }
@@ -541,56 +551,3 @@ if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) |
 }
 // iPad label click bugfix ]
 
-// removed [
-// LIB ESCAPE [
-/*** not tested
- (function() {
-  var objGlobal = this;
-  if(!(objGlobal.escape && objGlobal.unescape)) {
-    var escapeHash = {
-      _ : function(input) {
-        var ret = escapeHash[input];
-        if(!ret) {
-          if(input.length - 1) {
-            ret = String.fromCharCode(input.substring(input.length - 3 ? 2 : 1));
-          }
-          else {
-            var code = input.charCodeAt(0);
-            ret = code < 256
-              ? "%" + (0 + code.toString(16)).slice(-2).toUpperCase()
-              : "%u" + ("000" + code.toString(16)).slice(-4).toUpperCase();
-          }
-          escapeHash[ret] = input;
-          escapeHash[input] = ret;
-        }
-        return ret;
-      }
-    };
-    objGlobal.escape = objGlobal.escape || function(str) {
-      return str.replace(/[^\w @\*\-\+\.\/]/g, function(aChar) {
-        return escapeHash._(aChar);
-      });
- };
- objGlobal.unescape = objGlobal.unescape || function(str) {
-      return str.replace(/%(u[\da-f]{4}|[\da-f]{2})/gi, function(seq) {
-        return escapeHash._(seq);
-      });
-    };
- }
- })();
- */
-// LIB ESCAPE ]
-
-//    s += '<div class="scope" id="s-'+scope.uid+'" data-nodes="show" data-code="hide">';
-//    s += '<div class="scope-name">'+scope.name+'</div>';
-
-/*  _.each(objects, function(scope) {
-    s += scope.name+'<br>';
-    _.each(scope.objects, function(object, name) {
-//      s += name+'<br>';
-    });
-  });*/
-
-//  io.sockets.on('connection', function (socket) {
-
-// removed ]

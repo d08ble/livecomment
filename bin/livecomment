@@ -26,11 +26,17 @@ var options = {
       'run.eval'
     ],
 
-    paths: {}
+    paths: {},
+
+}
+options.paths[__dirname+'/../plugins/0'] = {
+    ignore: [
+    ]
 }
 options.paths[__dirname+'/..'] = {
     ignore: [
-      /^\.idea.*/
+      /^\.idea.*/,
+      "plugins/**"
     ]
 }
 

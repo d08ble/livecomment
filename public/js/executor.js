@@ -2,6 +2,20 @@
 
 var events = {EventEmitter: EventEmitter}
 
+// logging [
+
+var noLogging = [
+  'client.run.eval',
+  'client.exe.onframe',
+//  'client.exe.frame'
+]
+
+function isLogging(s) {
+  return noLogging.indexOf(s) == -1
+}
+
+// logging ]
+
 // constructor [
 function ObjectExecutor(options) {
   if (!(this instanceof ObjectExecutor)) return new ObjectExecutor(options);
@@ -15,6 +29,12 @@ function ObjectExecutor(options) {
 }
 ObjectExecutor.prototype.__proto__ = events.EventEmitter.prototype;
 // constructor ]
+
+// dbgbrk [
+ObjectExecutor.prototype.dbgbrk = function(s) {
+  console.log('dbgbrk', s)
+}
+// dbgbrk ]
 
 // startup [
 ObjectExecutor.prototype.startup = function startup() {
@@ -65,7 +85,9 @@ ObjectExecutor.prototype.onFrame = function onFrame(type, id, events, cb) {
     var s = evname+'['+ev+']'
     self.on(s, cb)
     self.object.events.push([s, cb])
-    console.log('EXE.ONFRAME', s, typeof cb)
+    if (isLogging('client.exe.onframe')) {
+      console.log('EXE.ONFRAME', s, typeof cb)
+    }
   })
 }
 // onFrame - PLUGIN SHARED ]
@@ -73,7 +95,8 @@ ObjectExecutor.prototype.onFrame = function onFrame(type, id, events, cb) {
 // frame - PLUGIN SHARED [
 ObjectExecutor.prototype.frame = function frame(type, id, options) {
   var frame = [type, id, options]
-  console.log('EXE.FRAME', frame)
+  if (isLogging('client.exe.frame'))
+    console.log('EXE.FRAME', frame)
   this.object.frames.push(frame)
   this.emitFrame(frame, 'frame')
 }
@@ -152,14 +175,16 @@ ObjectExecutor.prototype.setObject = function setObject(name) {
 
 // run [
 ObjectExecutor.prototype.run = function run(code, data) {
-  console.log('EVAL [');
-  console.log('CODE [');
-  console.log(code);
-  console.log('CODE ]');
-  console.log('DATA [');
-  console.log(data);
-  console.log('DATA ]');
-  console.log('EVAL ]');
+  if (isLogging('client.run.eval')) {
+    console.log('EVAL [');
+    console.log('CODE [');
+    console.log(code);
+    console.log('CODE ]');
+    console.log('DATA [');
+    console.log(data);
+    console.log('DATA ]');
+    console.log('EVAL ]');
+  }
   //    eval('console.log(this)')
   //    var frame = this.frame
   this.data = data
@@ -303,7 +328,8 @@ ObjectExecutor.prototype.hook = function hook(name, object, params) {
 /*
 //: 3. test css [
 //:= this.frame('client.exec')
-$("<style type='text/css'> #menu { background-color:#36E;} </style>").appendTo("head");
+
+//$("<style type='text/css'> #menu { background-color:#36E;} </style>").appendTo("head");
 //: 3. test css ]
 */
 
