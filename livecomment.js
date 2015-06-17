@@ -22,8 +22,9 @@
 
 // SOLVED [
 // 0.2.10 [
+// [+] fix analyze sequence queue
 // [+] hook beforeSet
-// [+] noLogging server watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, run.eval
+// [+] noLogging server watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, exe.onframe, run.eval
 // [+] config.noLogging watch.<type> added
 // [+] disable process.PORT, use config.port
 // [+] speed up networking
@@ -339,7 +340,8 @@ function LiveComment(options) {
       var s = evname+'['+ev+']'
       self.on(s, cb)
       self.object.events.push([s, cb])
-      console.log('EXE.ONFRAME', s, typeof cb)
+      if (isLogging('exe.onframe'))
+        console.log('EXE.ONFRAME', s, typeof cb)
     })
   }
   // onFrame - PLUGIN SHARED ]
@@ -504,6 +506,16 @@ function LiveComment(options) {
       }
     }
 
+    input.on('close', function() {
+
+    })
+
+    input.on('error', function(err) {
+      console.log('Error input stream', err)
+
+//      func('', true);
+    })
+
     input.on('data', function(data) {
       remaining += data;
 
@@ -637,7 +649,7 @@ function LiveComment(options) {
 
   // ANALYZE FILE [
 
-  function analyze(filename) {
+  function analyze(filename, analyzeCallback) {
 
     var stack = [];
     var input = fs.createReadStream(filename);
@@ -645,6 +657,8 @@ function LiveComment(options) {
     var lineN = 0;
     var objects = [];
     var lines = []
+
+    // CHECK EXTLANG [
 
     function _configGetExtLang(filext) {
       var fileext1 = filext.indexOf('.') == 0 ? fileext.substring(1, filext.length) : fileext;
@@ -656,15 +670,19 @@ function LiveComment(options) {
 
     var extlang = _configGetExtLang(fileext);
     if (!extlang) {
+      analyzeCallback()
       return;
     }
 
+    // CHECK EXTLANG ]
     // READ LINES/LINE [
+
     readLines(input, function readLine(line, complete) {
   //    console.log(line);
       lines.push(line);
       lineN += 1;
 
+      // checkCommentLine [
       function checkCommentLine(stack, fileext, line, lineN, cbs) {
 
         // custom comment format use config.extractCommentTagFromLine [
@@ -761,15 +779,18 @@ function LiveComment(options) {
 
         return true;
       };
+      // checkCommentLine ]
 
       // complete [
       if (complete)
       {
         mergeChanges(filename, extlang, lines, objects);
+        analyzeCallback()
         return true;
       }
       // complete ]
 
+      // check line [
       var res = checkCommentLine(stack, fileext, line, lineN, {
         begin: function(stack, c) {
         },
@@ -783,6 +804,7 @@ function LiveComment(options) {
           console.log('ERROR:', msg);
         }
       });
+      // check line ]
 
       return res;
     });
@@ -806,11 +828,14 @@ function LiveComment(options) {
 
   // SCANWATCH [
 
+  var analyzeQueue = async.queue(analyze)
+
   scanwatch.setup(options, function (type, file) {
     if (isLogging('watch.'+type))
       console.log(type, file)
     if (type != 'skip' && fs.existsSync(file) && !fs.lstatSync(file).isDirectory()) {
-      analyze(file)
+//      analyze(file)
+      analyzeQueue.push(file)
     }
   })
 

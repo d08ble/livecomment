@@ -33,6 +33,7 @@ module.exports = {
     'object.parsed',
     'exe.emit',
     'exe.frame',
+    'exe.onframe',
     'run.eval'
   ]
 
