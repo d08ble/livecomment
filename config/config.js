@@ -35,7 +35,9 @@ module.exports = {
     'exe.frame',
     'exe.onframe',
     'run.eval'
-  ]
+  ],
+
+  filterRoute: null // function(name, filter) :: bool
 
 //  hooks.beforeSet: function beforeSet(o) {return o;},
 };

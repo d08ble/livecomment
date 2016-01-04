@@ -3,8 +3,8 @@
 //:= this.frame('server.exec')
 
 console.log('0000-INIT.JS: '+(this.IsLivecommentServer?"server":"client"))
-//console.log(this)
-//this.dbgbrk('0000.INIT.JS')
+console.log(this)
+this.dbgbrk('0000.INIT.JS')
 // 0000 ]
 
 // client.css - CSS <style> tag [

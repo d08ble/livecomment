@@ -29,14 +29,14 @@ var options = {
     paths: {},
 
 }
-options.paths[__dirname+'/../plugins/0'] = {
-    ignore: [
-    ]
-}
+//options.paths[__dirname+'/../plugins/0'] = {
+//    ignore: [
+//    ]
+//}
 options.paths[__dirname+'/..'] = {
     ignore: [
       /^\.idea.*/,
-      "plugins/**"
+//      "plugins/**"
     ]
 }
 

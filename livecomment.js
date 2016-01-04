@@ -22,6 +22,12 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.11 [
+// [+] plugins/0/A000.js localhost:3000/plugins
+// [+] main view overwrite - config homeIndex: function (req, res)
+// [+] queryHash - unique page id for routing
+// [+] routing - config filterRoute: function(name, filter) :: bool
+// 0.2.11 ]
 // 0.2.10 [
 // [+] bugfix objname __lcFileCS hash checking
 // [+] client htmlEscape fix
@@ -97,7 +103,6 @@ var events = require('events');
 var scanwatch = require('scanwatch');
 
 // MODULE DEPS ]
-
 // LiveComment [
 
 function LiveComment(options) {
@@ -118,7 +123,6 @@ function LiveComment(options) {
   }
 
   // CONFIG ]
-
   // HTTP SERVER [
 
   var app = express();
@@ -136,6 +140,9 @@ function LiveComment(options) {
     next();
   });
   function homeIndex(req, res) {
+    if (config.homeIndex) {
+      return config.homeIndex(req, res)
+    }
     res.render('home', {
       title: 'Home'
     });
@@ -159,21 +166,25 @@ function LiveComment(options) {
 
   var io = require('socket.io').listen(config.ws_port);
 
-  var socketNotifyOnObjectUpdateHookSetup = false
   io.sockets.on('connection', function (socket) {
 
     console.log('Client', socket.handshake.address);
 
     // SEND CONNECTED [
+
     var time = (new Date).toLocaleTimeString();
     socket.json.send({'event': 'connected', 'time': time});
-    // SEND CONNECTED ]
 
+    // SEND CONNECTED ]
     // SEND INITIAL STATE - todo: client should require hash list [
+
     function sendState(socket) {
       var files = {};
       var objects = {}
       _.each(storage.objects, function(o) {
+        if (config.filterRoute && !config.filterRoute(o.name, socket.lcFilter)) {
+          return
+        }
 //        var buf = fs.readFileSync(o.filename, "utf8");
         objects[o.name] = {
           name: o.name,
@@ -185,52 +196,63 @@ function LiveComment(options) {
       socket.json.send({'event': 'state', 'objects': objects, 'files': files});
     };
 
-    sendState(socket);
+//    sendState(socket);
     // SEND INITIAL STATE - todo: client should require hash list ]
+    // ON MESSAGE [
 
     socket.on('message', function (msg) {
-      conslole.log('msg:', msg);
+      console.log('msg:', msg);
+      if (msg.event=='queryAll') {
+        socket.lcFilter = {
+          queryHash: msg.queryHash,
+          locationUrl: msg.locationUrl
+        };
+        sendState(socket);
+      }
     });
 
+    // ON MESSAGE ]
     // OBJECT UPDATE -> NOTIFY CLIENTS [
-    if (!socketNotifyOnObjectUpdateHookSetup) {
-      socketNotifyOnObjectUpdateHookSetup = false
-      storage.on('object.updated', function(o) {
 
-        io.sockets.sockets.forEach(function (socket) {
-          //var file = fs.readFileSync(o.filename, "utf8");
-          var obj = {
-            name: o.name,
-            extlang: o.extlang,
-            objects: o.objects
-          }
-          var file = o.lines.join('\n')
-          // hotfix: mulitple send same file - use socket-hash [
+    storage.on('object.updated', function(o) {
 
-          var hash = md5(file)
-          socket.__lcFileCS = socket.__lcFileCS || {}
-          if (!(socket.__lcFileCS[obj.name] && socket.__lcFileCS[obj.name] == hash)) {
-            socket.__lcFileCS[obj.name] = hash
-            socket.json.send({'event': 'object.updated', 'object': obj, 'file': file});
-          }
-          else {
-            console.log("duplicate "+ o.name)
-          }
+      io.sockets.sockets.forEach(function (socket) {
+        if (config.filterRoute && !config.filterRoute(o.name, socket.lcFilter)) {
+          return
+        }
 
-          // hotfix: mulitple send same file - use socket-hash ]
-        });
+        //var file = fs.readFileSync(o.filename, "utf8");
+        var obj = {
+          name: o.name,
+          extlang: o.extlang,
+          objects: o.objects
+        }
+        var file = o.lines.join('\n')
 
-      })
-    }
+        // hotfix: mulitple send same file - use socket-hash [
+
+        var hash = md5(file)
+        socket.__lcFileCS = socket.__lcFileCS || {}
+        if (!(socket.__lcFileCS[obj.name] && socket.__lcFileCS[obj.name] == hash)) {
+          socket.__lcFileCS[obj.name] = hash
+          socket.json.send({'event': 'object.updated', 'object': obj, 'file': file});
+        }
+        else {
+          console.log("duplicate "+ o.name)
+        }
+
+        // hotfix: mulitple send same file - use socket-hash ]
+      });
+    })
+
     // OBJECT UPDATE -> NOTIFY CLIENTS ]
 
   });
 
   // WS SERVER ]
-
   // OBJECT EXECUTOR [
-
   // constructor [
+
   function ObjectExecutor(options) {
     if (!(this instanceof ObjectExecutor)) return new ObjectExecutor(options);
     events.EventEmitter.call(this);
@@ -242,17 +264,22 @@ function LiveComment(options) {
     this.IsLivecommentClient = false
   }
   ObjectExecutor.prototype.__proto__ = events.EventEmitter.prototype;
-  // constructor ]
 
+  // constructor ]
   // startup [
+
   ObjectExecutor.prototype.startup = function startup() {
     var self = this
     this.test()
+
     // boostrap [
     // onFrame require this.object [
+
     this.object = {name:'SYS:::~~~23o4jwerfowe', events:[]}
+
     // onFrame require this.object ]
     // hook frame('server.exec') [
+
     this.onFrame('server.exec', '', 'frame', function() {
       try
       {
@@ -265,13 +292,15 @@ function LiveComment(options) {
         console.log('*** EVAL ERROR *** ]')
       }
     })
+
     // hook frame('server.exec') ]
     // boostrap ]
   }
-  // startup ]
 
+  // startup ]
   // callbacks [
   // beforeSet - hook. can modify object. todo: use common proto.hook [
+
 /*
   ObjectExecutor.prototype.beforeSet = function beforeSet(object) {
     // 3. return object
@@ -282,6 +311,7 @@ function LiveComment(options) {
     return object
   }
 */
+
   // beforeSet - hook. can modify object. todo: use common proto.hook ]
   // mount [
 
@@ -308,8 +338,8 @@ function LiveComment(options) {
 
   // unmount ]
   // callbacks ]
-
   // setObject [
+
   ObjectExecutor.prototype.setObject = function setObject(name) {
     var object = {
       name: name,
@@ -321,9 +351,10 @@ function LiveComment(options) {
     this.objects[name] = object
     this.object = object
   }
-  // setObject ]
 
+  // setObject ]
   // frame - PLUGIN SHARED [
+
   ObjectExecutor.prototype.frame = function frame(type, id, options) {
     var frame = [type, id, options]
     if (isLogging('exe.frame'))
@@ -331,9 +362,10 @@ function LiveComment(options) {
     this.object.frames.push(frame)
     this.emitFrame(frame, 'frame')
   }
-  // frame - PLUGIN SHARED ]
 
+  // frame - PLUGIN SHARED ]
   // onFrame - PLUGIN SHARED [
+
   ObjectExecutor.prototype.onFrame = function onFrame(type, id, events, cb) {
     if (type == 'this')
       id = this.object.name
@@ -348,9 +380,10 @@ function LiveComment(options) {
         console.log('EXE.ONFRAME', s, typeof cb)
     })
   }
-  // onFrame - PLUGIN SHARED ]
 
+  // onFrame - PLUGIN SHARED ]
   // test [
+
   ObjectExecutor.prototype.test = function test() {
 /*    this.on('beforeSet', function (o) {
       o.name = o.name+'TEST'
@@ -374,9 +407,10 @@ function LiveComment(options) {
     this.unmount('aaa')
     this.frame('test.css1')*/
   }
-  // test ]
 
+  // test ]
   // emitFrame [
+
   ObjectExecutor.prototype.emitFrame = function emitFrame(frame, event, mode) {
     var self = this
     function emit(a, b, c) {
@@ -390,17 +424,20 @@ function LiveComment(options) {
       emit(frame[0], '', frame[2])      // all types
     emit(frame[0], id, frame[2])  // specific type
   }
+
   // emitFrame ]
   // emitFrames [
+
   ObjectExecutor.prototype.emitFrames = function emitFrames(frames, event, mode) {
     var self = this
     _.each(frames, function (frame) {
       self.emitFrame(frame, event, mode)
     })
   }
-  // emitFrames ]
 
+  // emitFrames ]
   // run [
+
   ObjectExecutor.prototype.run = function run(code, data) {
     if (isLogging('run.eval')) {
       console.log('EVAL [');
@@ -426,9 +463,10 @@ function LiveComment(options) {
       console.log('*** EVAL ERROR *** ]')
     }
   }
-  // run ]
 
+  // run ]
   // process [
+
   ObjectExecutor.prototype.process = function process(object) {
     var self = this
     var comment = '//'
@@ -483,12 +521,12 @@ function LiveComment(options) {
       // 3. code execution ]
     })
   }
+
   // process ]
 
   var executor = new ObjectExecutor()
 
   // OBJECT EXECUTOR ]
-
   // LIB READ LINES [
 
   var fs = require('fs');
@@ -539,7 +577,6 @@ function LiveComment(options) {
   }
 
   // LIB READ LINES ]
-
   // LIB STRING [
 
   String.prototype.trim = function() {
@@ -547,7 +584,6 @@ function LiveComment(options) {
   };
 
   // LIB STRING ]
-
   // DataStorage [
 
   function DataStorage(options) {
@@ -559,6 +595,7 @@ function LiveComment(options) {
   DataStorage.prototype.__proto__ = events.EventEmitter.prototype;
 
   // set [
+
   DataStorage.prototype.set = function set(object) {
     // code execution [
     if (dangerousCodeExecution) {
@@ -585,8 +622,8 @@ function LiveComment(options) {
 
     this.emit('object.updated', object);
   }
-  // set ]
 
+  // set ]
   // DataObject [
 
   function DataObject(options) {
@@ -626,12 +663,10 @@ function LiveComment(options) {
   storage = new DataStorage();
 
   // DataStorage ]
-
   // MERGE LOGIC [
 
   function mergeChanges(filename, extlang, lines, objects) {
 
-  //  var prev = get(filename);
     if (objects.length > 0) {
 
       console.log(filename, extlang);
@@ -650,7 +685,6 @@ function LiveComment(options) {
   };
 
   // MERGE LOGIC ]
-
   // ANALYZE FILE [
 
   function analyze(filename, analyzeCallback) {
@@ -687,6 +721,7 @@ function LiveComment(options) {
       lineN += 1;
 
       // checkCommentLine [
+
       function checkCommentLine(stack, fileext, line, lineN, cbs) {
 
         // custom comment format use config.extractCommentTagFromLine [
@@ -783,18 +818,20 @@ function LiveComment(options) {
 
         return true;
       };
-      // checkCommentLine ]
 
+      // checkCommentLine ]
       // complete [
+
       if (complete)
       {
         mergeChanges(filename, extlang, lines, objects);
         analyzeCallback()
         return true;
       }
-      // complete ]
 
+      // complete ]
       // check line [
+
       var res = checkCommentLine(stack, fileext, line, lineN, {
         begin: function(stack, c) {
         },
@@ -808,6 +845,7 @@ function LiveComment(options) {
           console.log('ERROR:', msg);
         }
       });
+
       // check line ]
 
       return res;
@@ -817,9 +855,6 @@ function LiveComment(options) {
   };
 
   // ANALYZE FILE ]
-
-
-
   // CHECK PATH [
 
   function checkContainsPathComponent(dirs, path) {
@@ -829,7 +864,6 @@ function LiveComment(options) {
     });
   }
   // CHECK PATH ]
-
   // SCANWATCH [
 
   var analyzeQueue = async.queue(analyze)
@@ -844,11 +878,12 @@ function LiveComment(options) {
   })
 
   // SCANWATCH ]
-
   // dbgbrk [
+
   ObjectExecutor.prototype.dbgbrk = function(s) {
     console.log('dbgbrk', s)
   }
+
   // dbgbrk ]
 
 };

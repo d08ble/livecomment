@@ -3,14 +3,13 @@
 console.log('main initialized');
 
 // EXE ]
-
 // CONFIG [
 
 var ws_port = $("meta[name='ws_port']").attr('content') || 8980;
 var codeExecution = $("meta[name='code_execution']").attr('content');
+var queryHash = $("meta[name='queryHash']").attr('content');
 
 // CONFIG ]
-
 // TREE [
 
 function Tree() {
@@ -80,6 +79,7 @@ Tree.prototype.createNodeForParents = function createNodeForParents(parents) {
 
 // SORT [
 // not used: wrong sort [
+
 sortRecursive = function (node, compare) {
   node._children = node._children.sort(compare);
 
@@ -97,13 +97,12 @@ Tree.prototype.sortByLineNumber = function sortByLineNumber() {
     return a.lines[0] < b.lines[0] ? 0 : 1;
   });
 };
+
 // not used: wrong sort ]
-
 // SORT ]
-
 // TREE ]
-
 // HIDE-SHOW [
+
 function hideshow($n, v) {
   if (v == 'hide') {
     $n.hide();
@@ -162,7 +161,6 @@ function restoreHideShow($n, v) {
 }
 
 // HIDE-SHOW ]
-
 // MAIN VIEW [
 
 function MainView() {
@@ -273,9 +271,9 @@ MainView.prototype.delegateEvents = function delegateEvents($el) {
 };
 
 // delegateEvents ]
-
 // htmlString [
 // htmlEscape [
+
 function htmlEscape(str) {
   return String(str)
     .replace(/&/g, '&amp;')
@@ -284,14 +282,18 @@ function htmlEscape(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
+
 // htmlEscape ]
 // scope [
+
 function htmlStringScopeHeader(scope) {
   return '<div class="scope" id="s-'+scope.uid+'" data-nodes="show" data-code="hide">' +
     '<div class="scope-name">'+scope.name+'</div>'
 }
+
 // scope ]
 // node [
+
 function htmlStringNodeHeader(scope, node, k) {
   var nodeName = node.uid || 's-'+scope.uid
   var s = '<div class="node" id="n-'+htmlEscape(nodeName)+'" data-nodes="show" data-code="hide">'
@@ -299,9 +301,9 @@ function htmlStringNodeHeader(scope, node, k) {
     s += '<div class="node-name" style="padding-left: '+k*10+'px;">'+htmlEscape(node.name)+' '+node.lines[0]+','+node.lines[1]+'</div>'
   return s
 }
+
 // node ]
 // htmlString ]
-
 // UPDATE STATE [
 
 MainView.prototype.updateState = function updateState($el, objects, sources) {
@@ -443,8 +445,6 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
 };
 
 // UPDATE STATE ]
-
-
 // UPDATE STATE OBJECT [
 
 MainView.prototype.updateStateObject = function updateStateObject(object, source) {
@@ -462,7 +462,6 @@ MainView.prototype.updateStateObject = function updateStateObject(object, source
 };
 
 // UPDATE STATE OBJECT ]
-
 // MAIN VIEW ]
 
 $(document).ready(function onReady() {
@@ -470,6 +469,7 @@ $(document).ready(function onReady() {
   var mainView = new MainView();
 
   // WS CLIENT [
+
   socket = io.connect(window.location.hostname+':'+ws_port);
 
   socket.on('connect', function () {
@@ -484,10 +484,27 @@ $(document).ready(function onReady() {
         mainView.updateStateObject(msg.object, msg.file);
       }
     });
-  });
-  // WS CLIENT ]
 
+    // send queryAll [
+
+    socket.send({
+      event: 'queryAll',
+      queryHash: queryHash,
+      location: {
+        hostname: window.location.hostname,
+        port: window.location.port,
+        protocol: window.location.protocol,
+        pathname: window.location.pathname
+      }
+    });
+
+    // send queryAll ]
+
+  });
+
+  // WS CLIENT ]
   // MENU [
+  // CLICK [
 
   $('#menu #btnmm').click(function(e) {
     var a = $('.scope').find('.node:first').find('.node');
@@ -508,7 +525,9 @@ $(document).ready(function onReady() {
 //    a.show();
   });
 
+  // CLICK ]
   // MODE SELECTION [
+
   function mainViewStateSet(mode, recursive) {
     mainView.state.mode = mode;
     mainView.state.recursive = recursive;
@@ -531,12 +550,13 @@ $(document).ready(function onReady() {
   $('#menu #radio6').click(function() {
     mainViewStateSet('code childs', true);
   });
-  // MODE SELECTION ]
 
+  // MODE SELECTION ]
   // MENU ]
 });
 
 // iPad label click bugfix [
+
 if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i)) {
   $(document).ready(function () {
     $('label[for]').click(function () {
@@ -549,5 +569,6 @@ if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) |
     });
   });
 }
+
 // iPad label click bugfix ]
 
