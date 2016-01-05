@@ -1,30 +1,102 @@
-In progress..10%..20%..25%..45%..51%..55%..63%
 
-Run:
+### LiveComment information tool for Node
 
+* LiveComment for 80/20 developers
+* -1'000'000+ miles for your target
+* Code navigator
+* Code refactroing
+* Local cloud IDE extension
+* Your digital memory implant, brain helper
+* Copy of your main
+
+#### Install
+
+```
+$ npm install livecomment --save
+```
+
+#### Run Demo
+
+```
 $ node bin/livecomment
+```
 
-Open URL:
+#### Open URL
 
-http://localhost:3070/
+[http://localhost:3070/](http://localhost:3070/)
 
-*** LIVE COMMENT FOR 80/20 DEVELOPERS ***
+#### Usage sample 
 
-*** -1'000'000+ miles for your target ***
+```javascript
 
-*** CODE NAVIGATOR ***
+// Import LiveComment module
 
-*** LOCAL CLOUD IDE EXTENSION ***
+var LiveComment = require('livecomment');
 
-*** CODE REFACTORING ***
+// Define options (default options location livecomment/config/config.js)
 
-*** EASY & QUICK ***
+var options = {
+  port: 3070,
+  ws_port: 3071,
+  dangerousCodeExecution: ['client', 'server'], // for plugins
+  debug: 1,
+  common: {
+    ignore: [
+      /^node_modules.*/,
+      /^\.idea.*/,
+      /^\.svn.*/,
+      /^\.git.*/
+    ]
+  },
+  paths: [
+    '/path/to/dir/',
+    // === or ===
+    {
+      '/path/to/dir1': {
+        ignore: [
+          /.*dist.*/
+        ]
+      }
+    }
+  ]
+};
 
-*** SUMMER CODING BETTER ***
+// Start server
 
-*** YOUR DIGITAL MEMORY IMPLANT ***
+var livecomment = new LiveComment(options);
 
-0.2.11 [
+```
+#### Console output sample
+See on console like that:
+```
+✔ socket.io server listening on port 8980
+EXE.ONFRAME [server.exec][][frame] function
+Scan files [
+/path/to/dir/livecomment [
+/path/to/dir/livecomment ]
+Scan files ]
+Watch for changes [
+ /path/to/dir/livecomment
+ /path/to/dir/livecomment/bin
+ /path/to/dir/livecomment/config
+ /path/to/dir/livecomment/plugins
+ /path/to/dir/livecomment/public/css
+ /path/to/dir/livecomment/public/js
+ /path/to/dir/livecomment/views
+Watch for changes ]
+✔ Express server listening on port 3070 in development mode
+/path/to/dir/livecomment/bin/index-debug.js javascript
+EXE.EMIT [this][CHECK FORMAT][mount] undefined CHECK FORMAT
+EXE.EMIT [this][SUPPORT FORMATS][mount] undefined SUPPORT FORMATS
+/path/to/dir/livecomment/config/config.js javascript
+EXE.EMIT [this][DEFAULT CONFIG][mount] undefined DEFAULT CONFIG
+/path/to/dir/livecomment/livecomment.js javascript
+...
+```
+
+#### ChangeLog
+```
+// 0.2.11 [
 // [+] plugins/0/A000.js localhost:3000/plugins
 // [+] main view overwrite - config homeIndex: function (req, res)
 // [+] queryHash - unique page id for routing
@@ -73,6 +145,7 @@ http://localhost:3070/
 // 0.2.3 [
 // [+] bugfixing - expand on reload page
 // 0.2.3 ]
+// <0.2.2 [
 // [+] added state save/restore
 // [+] send broadcast event update. livecomment heartbeat
 // [+] notify client onChange event
@@ -89,3 +162,5 @@ http://localhost:3070/
 // [+] client view tree base
 // [+] code as node_module updated
 // [+] "ignore watch scan" paths config
+// <0.2.2 ]
+```

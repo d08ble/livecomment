@@ -20,7 +20,7 @@ this.dbgbrk('A000');
 config.filterRoute = function filterRoute(name, filter) {
   console.log(name)
 
-  if (filter.queryHash == 'plugins_only') {
+  if (filter && filter.queryHash == 'plugins_only') {
     return name.indexOf('plugins/0/') != -1;
   }
   return true;
