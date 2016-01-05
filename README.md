@@ -1,6 +1,8 @@
 
 ### LiveComment information tool for Node
 
+![alt text]( http://41.media.tumblr.com/d84b3498f829138b0742429bf9841e2e/tumblr_nn08gkQe8v1ut3bxko1_1280.jpg "Logo Title Text 1")
+
 * LiveComment for 80/20 developers
 * -1'000'000+ miles for your target
 * Code navigator
