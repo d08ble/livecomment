@@ -20,38 +20,29 @@ app.get('/plugins', routeC);
 config.filterRoute = function filterRoute(o, filter) {
   var name = o.name
   console.log(name)
-  console.log(o.objects)
+  console.log(filter)
+//  console.log(o.objects)
 
   var removedCount = 0;
   var newObjects = {}
   for (var oid in o.objects) {
-//    console.log(oid)
     var obj = o.objects[oid]
-    console.log(obj)
+//    console.log(obj)
     obj.lines[0] -= removedCount;
     obj.lines[1] -= removedCount;
     if (oid.indexOf('*HIDE*') != -1) {
       oid = oid.replace('*HIDE*', '(©)')
       removedCount += obj.lines[1] - obj.lines[0];
-      console.log(o.lines)
-      console.log(obj.lines[0], obj.lines[1] - obj.lines[0])
+//      console.log(o.lines)
+//      console.log(obj.lines[0], obj.lines[1] - obj.lines[0])
       o.lines.splice(obj.lines[0], obj.lines[1] - obj.lines[0])
-      console.log(o.lines)
+//      console.log(o.lines)
       obj.lines = [obj.lines[0], obj.lines[0] + 1]
     }
     newObjects[oid] = obj
   }
 
   o.objects = newObjects
-//  o.objects.forEach(function (os) {
-//    console.log(os)
-/*    if (os.indexOf('*HIDE*') != -1) {
-//      os = os.replace('*HIDE*', '(©)')
-//      lines = ['(©)']
-      console.log(o.lines)
-    }*/
-//  })
-
 
   if (filter && filter.queryHash == 'plugins_only') {
     return name.indexOf('plugins/0/') != -1;

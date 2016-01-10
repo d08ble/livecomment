@@ -22,6 +22,9 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.13 [
+// [+] fix filter.location
+// 0.2.13 ]
 // 0.2.12 [
 // [+] add *HIDE* option, see A000-1.x
 // [+] fix filterRoute for name -> object.name
@@ -209,7 +212,7 @@ function LiveComment(options) {
       if (msg.event=='queryAll') {
         socket.lcFilter = {
           queryHash: msg.queryHash,
-          locationUrl: msg.locationUrl
+          location: msg.location
         };
         sendState(socket);
       }
