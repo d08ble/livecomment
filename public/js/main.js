@@ -491,6 +491,7 @@ $(document).ready(function onReady() {
       event: 'queryAll',
       queryHash: queryHash,
       location: {
+        origin: window.location.origin,
         hostname: window.location.hostname,
         port: window.location.port,
         protocol: window.location.protocol,
