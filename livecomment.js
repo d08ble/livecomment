@@ -22,6 +22,12 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.15 [
+// [+] fix filterRoute dynamic changes with newO
+// 0.2.15 ]
+// 0.2.14 [
+// [-] filterRoute dynamic hostname - fail
+// 0.2.14 ]
 // 0.2.13 [
 // [+] fix filter.location
 // 0.2.13 ]
@@ -185,13 +191,30 @@ function LiveComment(options) {
     // SEND CONNECTED ]
     // SEND INITIAL STATE - todo: client should require hash list [
 
+    function applyFilter(o, filter) {
+      if (!config.filterRoute)
+        return
+      // for prevent change original object, only
+      var newO = {
+        name: o.name,
+        extlang: o.extlang,
+        objects: JSON.parse(JSON.stringify(o.objects)),
+        lines: o.lines.slice()
+      }
+      if (!config.filterRoute(newO, filter)) {
+        return null
+      }
+      return newO
+    }
+
     function sendState(socket) {
       var files = {};
       var objects = {}
-      _.each(storage.objects, function(o) {
-        if (config.filterRoute && !config.filterRoute(o, socket.lcFilter)) {
+      _.each(storage.objects, function(oSrc) {
+        o = applyFilter(oSrc, socket.lcFilter)
+        if (!o)
           return
-        }
+
 //        var buf = fs.readFileSync(o.filename, "utf8");
         objects[o.name] = {
           name: o.name,
@@ -221,12 +244,12 @@ function LiveComment(options) {
     // ON MESSAGE ]
     // OBJECT UPDATE -> NOTIFY CLIENTS [
 
-    storage.on('object.updated', function(o) {
+    storage.on('object.updated', function(oSrc) {
 
       io.sockets.sockets.forEach(function (socket) {
-        if (config.filterRoute && !config.filterRoute(o, socket.lcFilter)) {
+        o = applyFilter(oSrc, socket.lcFilter)
+        if (!o)
           return
-        }
 
         //var file = fs.readFileSync(o.filename, "utf8");
         var obj = {
