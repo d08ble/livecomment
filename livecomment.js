@@ -23,7 +23,7 @@
 
 // SOLVED [
 // 0.2.16 [
-// [+] add location.origin
+// [+] add location origin & host
 // 0.2.16 ]
 // 0.2.15 [
 // [+] fix filterRoute dynamic changes with newO
