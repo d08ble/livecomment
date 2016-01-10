@@ -22,6 +22,9 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.17 [
+// [+] fix filterRoute o global var bug
+// 0.2.17 [
 // 0.2.16 [
 // [+] add location origin & host
 // 0.2.16 ]
@@ -214,7 +217,7 @@ function LiveComment(options) {
       var files = {};
       var objects = {}
       _.each(storage.objects, function(oSrc) {
-        o = applyFilter(oSrc, socket.lcFilter)
+        var o = applyFilter(oSrc, socket.lcFilter)
         if (!o)
           return
 
@@ -250,7 +253,7 @@ function LiveComment(options) {
     storage.on('object.updated', function(oSrc) {
 
       io.sockets.sockets.forEach(function (socket) {
-        o = applyFilter(oSrc, socket.lcFilter)
+        var o = applyFilter(oSrc, socket.lcFilter)
         if (!o)
           return
 
