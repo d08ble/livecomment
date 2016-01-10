@@ -4,7 +4,7 @@
   },
   "name": "livecomment",
   "description": "Live comment for your live code",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "repository": {
     "type": "git",
     "url": "https://github.com/d08ble/livecomment.git"
@@ -32,10 +32,10 @@
     "url": "https://github.com/d08ble/livecomment/issues"
   },
   "homepage": "https://github.com/d08ble/livecomment",
-  "_id": "livecomment@0.2.9",
+  "_id": "livecomment@0.2.14",
   "dist": {
     "shasum": "118e332c29b07d4f23782e4ba938b3a6e4815525"
   },
-  "_from": "livecomment@0.2.9",
+  "_from": "livecomment@0.2.14",
   "_resolved": "https://registry.npmjs.org/livecomment/-/livecomment-0.2.9.tgz"
 }

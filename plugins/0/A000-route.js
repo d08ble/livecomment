@@ -27,22 +27,38 @@ config.filterRoute = function filterRoute(o, filter) {
   var newObjects = {}
   for (var oid in o.objects) {
     var obj = o.objects[oid]
-//    console.log(obj)
     obj.lines[0] -= removedCount;
     obj.lines[1] -= removedCount;
     if (oid.indexOf('*HIDE*') != -1) {
       oid = oid.replace('*HIDE*', '(©)')
       removedCount += obj.lines[1] - obj.lines[0];
-//      console.log(o.lines)
-//      console.log(obj.lines[0], obj.lines[1] - obj.lines[0])
       o.lines.splice(obj.lines[0], obj.lines[1] - obj.lines[0])
-//      console.log(o.lines)
       obj.lines = [obj.lines[0], obj.lines[0] + 1]
     }
     newObjects[oid] = obj
   }
 
   o.objects = newObjects
+
+  // fix dynamic hostname (bad - filterRoute set once, need another hook)
+
+//  var newObjects= {}
+//  for (var oid in o.objects) {
+//    var obj = o.objects[oid]
+//    for (var i in o.lines) {
+//      var line = o.lines[i]
+//      line = line.replace('*TEST_HOSTNAME*', filter && filter.location.hostname)
+//      o.lines[i] = line+'111'
+//    }
+/*    console.log('oid='+oid)
+    var q = filter && filter.location.hostname
+    oid = oid.replace('*TEST_HOSTNAME*', q)
+    console.log('AAA='+(filter && filter.location.hostname))
+    console.log('q='+q)
+    console.log('oid='+oid)
+    newObjects[oid] = obj*/
+//  }
+//  o.objects = newObjects
 
   if (filter && filter.queryHash == 'plugins_only') {
     return name.indexOf('plugins/0/') != -1;
@@ -75,3 +91,6 @@ config.homeIndex = function homeIndex1(req, res) {
 // A000-1.1 test after hide 1 [
 // show this message success!
 // A000-1.1 test after hide 1 ]
+// A000-2 test hostname [
+//  $hostname=*TEST_HOSTNAME*
+// A000-2 test hostname ]
