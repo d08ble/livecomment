@@ -42,14 +42,14 @@ config.filterRoute = function filterRoute(o, filter) {
 
   for (var i in o.lines) {
     var line = o.lines[i]
-    line = line.replace('*TEST_HOSTNAME*', filter && filter.location.hostname)
+    line = line.replace('*TEST_HOSTNAME*', filter && filter.location.origin)
     o.lines[i] = line
   }
 
   var newObjects= {}
   for (var oid in o.objects) {
     var obj = o.objects[oid]
-    oid = oid.replace('*TEST_HOSTNAME*', filter && filter.location.hostname) +''
+    oid = oid.replace('*TEST_HOSTNAME*', filter && filter.location.origin) +''
     newObjects[oid] = obj
   }
 
