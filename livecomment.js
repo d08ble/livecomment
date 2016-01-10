@@ -24,6 +24,7 @@
 // SOLVED [
 // 0.2.17 [
 // [+] fix filterRoute o global var bug
+// [+] fix applyFilter config.filterRoute null bug
 // 0.2.17 [
 // 0.2.16 [
 // [+] add location origin & host
@@ -199,7 +200,7 @@ function LiveComment(options) {
 
     function applyFilter(o, filter) {
       if (!config.filterRoute)
-        return
+        return o
       // for prevent change original object, only
       var newO = {
         name: o.name,
