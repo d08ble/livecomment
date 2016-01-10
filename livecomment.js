@@ -22,6 +22,10 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.12 [
+// [+] add *HIDE* option, see A000-1.x
+// [+] fix filterRoute for name -> object.name
+// 0.2.12 ]
 // 0.2.11 [
 // [+] plugins/0/A000.js localhost:3000/plugins
 // [+] main view overwrite - config homeIndex: function (req, res)
@@ -182,7 +186,7 @@ function LiveComment(options) {
       var files = {};
       var objects = {}
       _.each(storage.objects, function(o) {
-        if (config.filterRoute && !config.filterRoute(o.name, socket.lcFilter)) {
+        if (config.filterRoute && !config.filterRoute(o, socket.lcFilter)) {
           return
         }
 //        var buf = fs.readFileSync(o.filename, "utf8");
@@ -217,7 +221,7 @@ function LiveComment(options) {
     storage.on('object.updated', function(o) {
 
       io.sockets.sockets.forEach(function (socket) {
-        if (config.filterRoute && !config.filterRoute(o.name, socket.lcFilter)) {
+        if (config.filterRoute && !config.filterRoute(o, socket.lcFilter)) {
           return
         }
 

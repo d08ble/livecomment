@@ -4,7 +4,7 @@
   },
   "name": "livecomment",
   "description": "Live comment for your live code",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "repository": {
     "type": "git",
     "url": "https://github.com/d08ble/livecomment.git"
@@ -28,8 +28,6 @@
   "engines": {
     "node": "*"
   },
-  "readme": "In progress..10%..20%..25%..45%..51%..55%..63%\n\nRun:\n$ node bin/livecomment\n\nOpen URL:\nhttp://localhost:3070/\n\n*** LIVE COMMENT FOR 80/20 DEVELOPERS ***\n*** -1'000'000+ miles for your target ***\n*** CODE NAVIGATOR ***\n*** LOCAL CLOUD IDE EXTENSION ***\n*** CODE REFACTORING ***\n*** EASY & QUICK ***\n*** SUMMER CODING BETTER ***\n*** YOUR DIGITAL MEMORY IMPLANT ***\n",
-  "readmeFilename": "README",
   "bugs": {
     "url": "https://github.com/d08ble/livecomment/issues"
   },
