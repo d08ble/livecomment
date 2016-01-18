@@ -22,10 +22,14 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.18 [
+// [+] hihglight slow bugfix. now replace highlightCodeProcess codeOnShow codeOnHide for custom processing in plugins
+// [ ] iframe plugin
+// 0.2.18 ]
 // 0.2.17 [
 // [+] fix filterRoute o global var bug
 // [+] fix applyFilter config.filterRoute null bug
-// 0.2.17 [
+// 0.2.17 ]
 // 0.2.16 [
 // [+] add location origin & host
 // 0.2.16 ]

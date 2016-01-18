@@ -109,6 +109,7 @@ function hideshow($n, v) {
   } else {
     $n.show();
   }
+  highlightCodeProcess(v, $n, false)
 }
 function hideShowNodes($n, v) {
   hideshow($n, v);
@@ -304,6 +305,33 @@ function htmlStringNodeHeader(scope, node, k) {
 
 // node ]
 // htmlString ]
+// highlight on show/hide event [
+
+var codeOnShow = function ($code) {
+  //if ([highlighted!='true']) {
+  if (!$($code).attr('highlighted')) {
+    Prism.highlightElement($code)
+    $($code).attr('highlighted', true)
+  }
+}
+var codeOnHide = function ($code) {
+
+}
+
+var highlightCodeProcess = function (mode, $el, subnode) {
+  var $nodes = subnode ? $el.find("div[data-code='"+mode+"']") : $el
+  var $codes = $nodes.find("code")
+  _.each($codes, function ($code) {
+    if (mode == 'show') {
+      codeOnShow($code)
+    }
+    else {
+      codeOnHide($code)
+    }
+  });
+}
+
+// highlight on show/hide event ]
 // UPDATE STATE [
 
 MainView.prototype.updateState = function updateState($el, objects, sources) {
@@ -424,18 +452,9 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
 
   $el.html(s);
 
-  restoreHideShow($el.find('.node'));
-/*
-  $('pre code').each(function(i, block) {
-    hljs.highlightBlock(block);
-  });
-*/
-//  Prism.highlightAll();
-  var $codes = $el.find('code')
-  _.each($codes, function ($code) {
-    Prism.highlightElement($code);
-  })
-//  Prism.highlightElement($els);
+  restoreHideShow($el.find('.node'))
+
+  highlightCodeProcess('show', $el, true)
 
   this.delegateEvents($el);
 
