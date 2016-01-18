@@ -202,8 +202,12 @@ var _ = self.Prism = {
 
 			delete grammar.rest;
 		}
-
-		tokenloop: for (var token in grammar) {
+    var grammar1 = {}
+    Object.keys(grammar).sort().forEach(function(key) {
+//      console.log(grammar[key])
+      grammar1[key] = grammar[key]
+    })
+		tokenloop: for (var token in grammar1) {
 			if(!grammar.hasOwnProperty(token) || !grammar[token]) {
 				continue;
 			}
@@ -1186,8 +1190,7 @@ for (var language in Prism.languages) {
 			def.inside['email-link'] = email;
 		}
 	});
-	
-	tokens['url-link'] = url;
+	tokens['aurl-link'] = url;
 	tokens['email-link'] = email;
 }
 

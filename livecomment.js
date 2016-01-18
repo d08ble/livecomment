@@ -24,7 +24,8 @@
 // SOLVED [
 // 0.2.18 [
 // [+] hihglight slow bugfix. now replace highlightCodeProcess codeOnShow codeOnHide for custom processing in plugins
-// [ ] iframe plugin
+// [+] fix prism.js tokenize url bug order (!warning, temporrary bugfix)
+// [+] iframe plugin
 // 0.2.18 ]
 // 0.2.17 [
 // [+] fix filterRoute o global var bug

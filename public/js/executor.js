@@ -327,7 +327,7 @@ ObjectExecutor.prototype.hook = function hook(name, object, params) {
 
 /*
 //: 3. test css [
-//:= this.frame('client.exec')
+//: = this.frame('client.exec')
 
 //$("<style type='text/css'> #menu { background-color:#36E;} </style>").appendTo("head");
 //: 3. test css ]
@@ -335,7 +335,7 @@ ObjectExecutor.prototype.hook = function hook(name, object, params) {
 
 /*
 //: 4. test editor [
-//:= this.frame('client.exec')
+//: = this.frame('client.exec')
 
 $("<style type='text/css' media='screen' id='ace-editor-css'> #ace-editor-view {"+
 "        margin: 70px;"+
