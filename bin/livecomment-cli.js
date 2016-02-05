@@ -34,14 +34,14 @@
       'sh': 'c'
     },
 
-    noLogging: [/*
+    noLogging: [
       'watch.skip',
       'watch.scan',
       'object.parsed',
       'exe.emit',
       'exe.frame',
       'exe.onframe',
-      'run.eval'*/
+      'run.eval'
     ],
 
     paths: []
