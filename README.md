@@ -15,7 +15,8 @@ LiveComment is the missing link in the Evolution of the Web.
 
 #### Info
 
-![alt text]( http://41.media.tumblr.com/d84b3498f829138b0742429bf9841e2e/tumblr_nn08gkQe8v1ut3bxko1_1280.jpg "Logo Title Text 1")
+![alt text]( https://cdn.rawgit.com/d08ble/media/master/screen0.png "LiveComment inside")
+![alt text]( http://41.media.tumblr.com/d84b3498f829138b0742429bf9841e2e/tumblr_nn08gkQe8v1ut3bxko1_1280.jpg "LightTable+LiveComment")
 
 * LiveComment for 80/20 developers
 * -1'000'000+ miles for your target
