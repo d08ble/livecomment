@@ -22,6 +22,9 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.19 [
+// [+] update readme
+// 0.2.19 ]
 // 0.2.18 [
 // [+] hihglight slow bugfix. now replace highlightCodeProcess codeOnShow codeOnHide for custom processing in plugins
 // [+] fix prism.js tokenize url bug order (!warning, temporrary bugfix)
