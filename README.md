@@ -111,6 +111,10 @@ EXE.EMIT [this][DEFAULT CONFIG][mount] undefined DEFAULT CONFIG
 ...
 ```
 
+#### Donate BTC
+
+18Bth1u3pSJzPrCf21tx1F6iSzA2fgKdfU
+
 #### License
 
 [MIT](https://github.com/d08ble/livecomment/blob/master/LICENSE)
