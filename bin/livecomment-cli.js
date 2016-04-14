@@ -65,6 +65,7 @@
     'ignore': 'filter files in path',
     'dangerousCodeExecutionClient': 'run js plugins locally, can access your system files (default: disabled)',
     'dangerousCodeExecutionServer': 'run js plugins in html, can controll your browser (default: disabled)',
+    'fileProcessDelay': 'file process delay (default: 1s)',
     'debug': 'enable debug mode (default: NO)',
     'log': 'enable logging for event types: watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, exe.onframe, run.eval',
     'verbose': 'verbose'
@@ -110,6 +111,9 @@
   }
   if (argv.debug) {
     options.debug = argv.debug
+  }
+  if (argv.fileProcessDelay) {
+    options.fileProcessDelay = argv.fileProcessDelay
   }
   if (argv.dangerousCodeExecutionClient) {
     options.dangerousCodeExecution.push('client')
