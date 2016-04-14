@@ -22,6 +22,9 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.20 [
+// [+] bugfix fast file update by livelogging - add delayed process and config.fileProcessDelay (default 1s)
+// 0.2.20 ]
 // 0.2.19 [
 // [+] update readme
 // 0.2.19 ]
@@ -911,15 +914,40 @@ function LiveComment(options) {
   }
   // CHECK PATH ]
   // SCANWATCH [
+  // files queue [
 
   var analyzeQueue = async.queue(analyze)
+
+  var delayedFiles = {}
+
+  function addDelayedFile(file) {
+    delayedFiles[file] = new Date()
+    var delayedFilesInterval = setInterval(function () {
+      var now = new Date()
+      _.each(delayedFiles, function (t, file) {
+        var dt = now - t
+        var maxTime = config && config.fileProcessDelay || 0
+        if (dt > maxTime) {
+//          console.log(file, dt)
+          delete delayedFiles[file]
+          analyzeQueue.push(file)
+        }
+      })
+      if (_.size(delayedFiles) == 0) {
+        clearInterval(delayedFilesInterval)
+      }
+    }, 200)
+  }
+
+  // files queue ]
 
   scanwatch.setup(options, function (type, file) {
     if (isLogging('watch.'+type))
       console.log(type, file)
     if (type != 'skip' && fs.existsSync(file) && !fs.lstatSync(file).isDirectory()) {
 //      analyze(file)
-      analyzeQueue.push(file)
+//      analyzeQueue.push(file)
+      addDelayedFile(file)
     }
   })
 

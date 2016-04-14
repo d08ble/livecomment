@@ -37,8 +37,10 @@ module.exports = {
     'run.eval'
   ],
 
-  filterRoute: null // function(name, filter) :: bool
+  filterRoute: null, // function(name, filter) :: bool
 
 //  hooks.beforeSet: function beforeSet(o) {return o;},
+
+  fileProcessDelay: 1000
 };
 // DEFAULT CONFIG ]
