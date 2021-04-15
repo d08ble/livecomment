@@ -10,6 +10,10 @@
     "url": "https://github.com/d08ble/livecomment.git"
   },
   "main": "./livecomment.js",
+  "preferGlobal": true,
+  "bin": {
+    "livecomment": "./bin/livecomment"
+  },
   "dependencies": {
     "express": "^4.5.1",
     "connect-assets": "^3.0.2",
