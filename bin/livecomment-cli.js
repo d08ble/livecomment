@@ -31,7 +31,14 @@
       'acpul': 'c',
 
       'pro': 'c',
-      'sh': 'c'
+      'sh': 'c',
+
+      'rs': 'javascript',
+      'toml': 'py',
+
+      'py': 'python',
+
+      'swift': 'c'
     },
 
     noLogging: [
@@ -145,6 +152,67 @@
   }
 
   // process args ]
+
+options.extractCommentTagFromLine = function extractCommentTagFromLine(fileext, line) {
+  line = line.trim();
+  // CHECK FORMAT [
+  var b;
+  function chkfmt(b) {
+    if (line.indexOf(b) == 0 && line.indexOf('[') == line.length-1) // begin
+      return [line.substr(b.length, line.length-b.length-1).trim(), 0];
+    if (line.indexOf(b) == 0 && line.indexOf(']') == line.length-1 && line.indexOf('[') == -1) // end
+      return [line.substr(b.length, line.length-b.length-1).trim(), 1];
+    return null;
+  };
+  // CHECK FORMAT ]
+
+  // SUPPORT FORMATS [
+  switch (fileext) {
+    case '.log':
+    case '.txt':
+      function chkfmt0() {
+        if (line.length > 0 && line.indexOf('[') == line.length-1) {// begin
+          return [line.substr(0, line.length-1).trim(), 0];
+        }
+        if (line.length > 0 && line.indexOf(']') == line.length-1 && line.indexOf('[') == -1) { // end
+          return [line.substr(0, line.length-1).trim(), 1];
+        }
+        return null
+      }
+      return chkfmt0() || false;
+    case '.ts':
+    case '.js':
+    case '.java':
+    case '.c':
+    case '.h':
+    case '.cpp':
+    case '.hpp':
+    case '.less':
+    case '.m':
+    case '.mm':
+    case '.rs':
+    case '.swift':
+      return chkfmt('//') || false;
+    case '.css':
+      return chkfmt('/*') || false;
+    case '.acpul':
+    case '.sh':
+    case '.py':
+    case '.pro':
+    case '.toml':
+      return chkfmt('#') || false;
+    case '.ejs':
+    case '.jade':
+    case '.sass':
+    case '.styl':
+    case '.coffee':
+      break;
+    default:
+      return null;
+  }
+  // SUPPORT FORMATS ]
+  return false;
+}
 
   var LiveComment = require('../livecomment')
   var livecomment = new LiveComment(options)
