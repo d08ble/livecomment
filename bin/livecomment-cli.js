@@ -58,6 +58,8 @@
   // help [
 
   var usage = process.argv[1]+' [--port <port>] [--ws_port <port>] [--path <path> [--ignore <regexp>]]...\n' +
+    '  [--preset <name>\n' +
+    '  [--ws_port_client <port>\n' +
     '  [--dangerousCodeExecutionClient] [--dangerousCodeExecutionServer] \n' +
     '  [--debug]' +
     '  [--log <type[,type...]>]' +
@@ -68,6 +70,7 @@
   var describe = {
     'port': 'http port (default: 3070)',
     'ws_port': 'websocket port (default: 8980)',
+    'ws_port_client': 'websocket port for client (default: 8980) for vm port mapping like 8980:12345',
     'path': 'path to your files',
     'ignore': 'filter files in path',
     'dangerousCodeExecutionClient': 'run js plugins locally, can access your system files (default: disabled)',
@@ -75,7 +78,8 @@
     'fileProcessDelay': 'file process delay (default: 1s)',
     'debug': 'enable debug mode (default: NO)',
     'log': 'enable logging for event types: watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, exe.onframe, run.eval',
-    'verbose': 'verbose'
+    'verbose': 'verbose',
+    'preset': 'options preset, available presets: node (todo)'
   }
 
   // help ]
@@ -108,13 +112,16 @@
       return true
     }
   })
-//  console.log(argv)
 
+  // Process options
   if (argv.port) {
     options.port = argv.port
   }
   if (argv.ws_port) {
     options.ws_port = argv.ws_port
+  }
+  if (argv.ws_port_client) {
+    options.ws_port_client = argv.ws_port_client
   }
   if (argv.debug) {
     options.debug = argv.debug

@@ -6,7 +6,7 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     meta(name='description', content='livecomment for live projects')
     meta(name='author', content='d08ble')
-    meta(name='ws_port', content='#{config.ws_port}')
+    meta(name='ws_port', content='#{config.ws_port_client || config.ws_port}')
     meta(name='code_execution', content='#{config.clientCodeExecution}')
     meta(name='queryHash', content='#{queryHash}')
     title livecomment
