@@ -22,6 +22,15 @@
 // KNOWN BUGS ]
 
 // SOLVED [
+// 0.2.22 [
+// Improve livecomment options:
+// Start for current dir:
+// $ livecomment
+// $ livecomment .
+// --dangerousCodeExecutionClient is enabled by default and deprecated
+// 0.2.22 ]
+// 0.2.21 [
+// 0.2.21 ]
 // 0.2.20 [
 // [+] bugfix fast file update by livelogging - add delayed process and config.fileProcessDelay (default 1s)
 // 0.2.20 ]

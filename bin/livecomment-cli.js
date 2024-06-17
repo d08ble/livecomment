@@ -65,7 +65,8 @@
     '  [--log <type[,type...]>]' +
     '  [--verbose]\n\n' +
     '  Example:\n' +
-    "    livecomment --port 5000 --ws_port 5001 --ignore '\.git\/' --path . --ignore '\/node_modules.*' --path config/ --dangerousCodeExecutionClient --dangerousCodeExecutionServer --debug 1 --log=watch.skip,watch.scan --help\n"
+    '   livecomment .\n' +
+    "   livecomment --port 5000 --ws_port 5001 --ignore '\.git\/' --path . --ignore '\/node_modules.*' --path config/ --dangerousCodeExecutionClient --dangerousCodeExecutionServer --debug 1 --log=watch.skip,watch.scan --help\n"
 
   var describe = {
     'port': 'http port (default: 3070)',
@@ -73,8 +74,8 @@
     'ws_port_client': 'websocket port for client (default: 8980) for vm port mapping like 8980:12345',
     'path': 'path to your files',
     'ignore': 'filter files in path',
-    'dangerousCodeExecutionClient': 'run js plugins locally, can access your system files (default: disabled)',
-    'dangerousCodeExecutionServer': 'run js plugins in html, can controll your browser (default: disabled)',
+    'dangerousCodeExecutionClient': '(depreacted, always enabled) run js plugins in html, can controll your browser',
+    'dangerousCodeExecutionServer': 'run js plugins locally, can access your system files (default: disabled)',
     'fileProcessDelay': 'file process delay (default: 1s)',
     'debug': 'enable debug mode (default: NO)',
     'log': 'enable logging for event types: watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, exe.onframe, run.eval',
@@ -89,6 +90,20 @@
 
   var lastPath
 
+function addPath(path) {
+    var o = {}
+    o[path] = {
+      ignore: [
+      ]
+    }
+    lastPath = o[path]
+    options.paths.push(o);
+}
+
+var workingDirectory = process.cwd()
+console.log("workingDirectory", workingDirectory)
+
+
   var argv = minimist(process.argv.slice(2), {
     unknown: function(arg, key, val) {
       if (key == 'ignore') {
@@ -100,6 +115,7 @@
         }
       }
       else if (key == 'path') {
+        addPath(val)
         var o = {}
         o[val] = {
           ignore: [
@@ -108,10 +124,19 @@
         lastPath = o[val]
         options.paths.push(o);
       }
+      if (arg == '.') {
+        // $ livecomment .
+        addPath(workingDirectory)
+      }
 //      console.log(key, val)
       return true
     }
   })
+
+  // Add work dir as default
+  if (options.paths.length == 0) {
+    addPath(workingDirectory)
+  }
 
   // Process options
   if (argv.port) {
@@ -129,9 +154,10 @@
   if (argv.fileProcessDelay) {
     options.fileProcessDelay = argv.fileProcessDelay
   }
-  if (argv.dangerousCodeExecutionClient) {
-    options.dangerousCodeExecution.push('client')
-  }
+  
+  // Always enable frontend plugins
+  options.dangerousCodeExecution.push('client')
+
   if (argv.dangerousCodeExecutionServer) {
     options.dangerousCodeExecution.push('server')
   }
