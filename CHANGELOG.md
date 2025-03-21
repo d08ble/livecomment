@@ -11,7 +11,18 @@
 ## [0.2.23] - 2024-03-21
 ### Changed
 - Moved version history to separate file
-- Improved code organization
+- Updated dependencies to newer versions including:
+  - express: ^4.18.2
+  - connect-assets: ^6.0.1
+  - node-watch: ^0.7.3
+  - underscore: ^1.13.6
+  - socket.io: ^4.7.2
+- Replaced jade with pug template engine
+- Migrated from Jade to Pug template engine
+- Deleted old Jade templates and added new Pug templates
+- Updated Socket.IO from v1.2.0 to v4.7.4
+- Added CHANGELOG.md
+- Added .nvmrc for Node.js version management
 
 ## [0.2.22] - 2024-03-21
 ### Changed
