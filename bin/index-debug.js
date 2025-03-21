@@ -43,7 +43,9 @@ options.extlangs = {
   'sh': 'c',
 
   'log': 'none',
-  'txt': 'none'
+  'txt': 'none',
+
+  'pug': 'pug',
 }
 var p = 0
 
@@ -97,6 +99,8 @@ options.extractCommentTagFromLine = function extractCommentTagFromLine(fileext, 
     case '.styl':
     case '.coffee':
       break;
+    case '.pug':
+      return chkfmt('//') || false;
     default:
       return null;
   }

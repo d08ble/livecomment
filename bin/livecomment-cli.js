@@ -240,6 +240,8 @@ options.extractCommentTagFromLine = function extractCommentTagFromLine(fileext, 
     case '.styl':
     case '.coffee':
       break;
+    case '.pug':
+      break;
     default:
       return null;
   }

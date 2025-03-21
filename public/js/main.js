@@ -310,7 +310,7 @@ function htmlStringNodeHeader(scope, node, k) {
 var codeOnShow = function ($code) {
   //if ([highlighted!='true']) {
   if (!$($code).attr('highlighted')) {
-    Prism.highlightElement($code)
+//    Prism.highlightElement($code)
     $($code).attr('highlighted', true)
   }
 }
@@ -488,42 +488,37 @@ $(document).ready(function onReady() {
   var mainView = new MainView();
 
   // WS CLIENT [
+  class LiveCommentSocket extends SocketIOClient {
+    onConnect() {
+      console.log('io.connected');
+      // Send initial query
+      this.send({
+        event: 'queryAll',
+        queryHash: queryHash,
+        location: {
+          host: window.location.host,
+          origin: window.location.origin,
+          hostname: window.location.hostname,
+          port: window.location.port,
+          protocol: window.location.protocol,
+          pathname: window.location.pathname
+        }
+      });
+    }
 
-  socket = io.connect(window.location.hostname+':'+ws_port);
-
-  socket.on('connect', function () {
-    console.log('io.connected');
-
-    socket.on('message', function (msg) {
-//      console.log('msg:', msg);
+    onMessage(msg) {
       if (msg.event == 'state') {
         mainView.updateState(mainView.$el, msg.objects, msg.files);
       } else if (msg.event == 'object.updated') {
-//        console.log(msg);
         mainView.updateStateObject(msg.object, msg.file);
       }
-    });
+    }
+  }
 
-    // send queryAll [
-
-    socket.send({
-      event: 'queryAll',
-      queryHash: queryHash,
-      location: {
-        host: window.location.host,
-        origin: window.location.origin,
-        hostname: window.location.hostname,
-        port: window.location.port,
-        protocol: window.location.protocol,
-        pathname: window.location.pathname
-      }
-    });
-
-    // send queryAll ]
-
-  });
-
+  const socket = new LiveCommentSocket(window.location.hostname, ws_port);
+  socket.connect();
   // WS CLIENT ]
+
   // MENU [
   // CLICK [
 

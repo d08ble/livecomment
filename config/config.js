@@ -4,7 +4,10 @@ module.exports = {
 
   port: 3070,
   ws_port: 8980,
+  ws_port_client: 8980,
   debug: false,
+
+  maxFileSize: 1000000,
 
   extlangs: {
     'css': 'css',

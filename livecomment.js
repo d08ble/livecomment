@@ -21,114 +21,6 @@
 // || lazy update
 // KNOWN BUGS ]
 
-// SOLVED [
-// 0.2.22 [
-// Improve livecomment options:
-// Start for current dir:
-// $ livecomment
-// $ livecomment .
-// --dangerousCodeExecutionClient is enabled by default and deprecated
-// 0.2.22 ]
-// 0.2.21 [
-// 0.2.21 ]
-// 0.2.20 [
-// [+] bugfix fast file update by livelogging - add delayed process and config.fileProcessDelay (default 1s)
-// 0.2.20 ]
-// 0.2.19 [
-// [+] update readme
-// 0.2.19 ]
-// 0.2.18 [
-// [+] hihglight slow bugfix. now replace highlightCodeProcess codeOnShow codeOnHide for custom processing in plugins
-// [+] fix prism.js tokenize url bug order (!warning, temporrary bugfix)
-// [+] iframe plugin
-// [+] cli works - bin/livecomment
-// 0.2.18 ]
-// 0.2.17 [
-// [+] fix filterRoute o global var bug
-// [+] fix applyFilter config.filterRoute null bug
-// 0.2.17 ]
-// 0.2.16 [
-// [+] add location origin & host
-// 0.2.16 ]
-// 0.2.15 [
-// [+] fix filterRoute dynamic changes with newO
-// 0.2.15 ]
-// 0.2.14 [
-// [-] filterRoute dynamic hostname - fail
-// 0.2.14 ]
-// 0.2.13 [
-// [+] fix filter.location
-// 0.2.13 ]
-// 0.2.12 [
-// [+] add *HIDE* option, see A000-1.x
-// [+] fix filterRoute for name -> object.name
-// 0.2.12 ]
-// 0.2.11 [
-// [+] plugins/0/A000.js localhost:3000/plugins
-// [+] main view overwrite - config homeIndex: function (req, res)
-// [+] queryHash - unique page id for routing
-// [+] routing - config filterRoute: function(name, filter) :: bool
-// 0.2.11 ]
-// 0.2.10 [
-// [+] bugfix objname __lcFileCS hash checking
-// [+] client htmlEscape fix
-// [+] plugins/0 added
-// [+] fix analyze sequence queue
-// [+] hook beforeSet
-// [+] noLogging server watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, exe.onframe, run.eval
-// [+] config.noLogging watch.<type> added
-// [+] disable process.PORT, use config.port
-// [+] speed up networking
-// [+] bugfix: scan break when remaining+'\n' > 0
-// [+] configure ws port
-// [+] code execution client
-// [+] code execution server
-// [+] reconnect on each message bugfix: socket.io 1.2.0 updated
-// [+] tested: add onLoaded event at startup -> send event:'state'
-// [+] bugfix: add new object client updateState is wrong
-// [+] bugfix: optimized Prism.highlightAll
-// [+] bugfix: client scope to end (from begin) fixed
-// [+] bugfix: fix crash out of memory while scan binary files (add async logic)
-// 0.2.10 ]
-// 0.2.9 [
-// [+] type 'skip' bugfix
-// 0.2.9 ]
-// 0.2.8 [
-// [+] require scanwatch. config changed (see bin/livecomment)
-// 0.2.8 ]
-// 0.2.7 [
-// [+] added sh pro
-// [+] shell scripts highlight
-// 0.2.7 ]
-// 0.2.6 [
-// [+] added acpu heartbeat animation
-// 0.2.6 ]
-// 0.2.5 [
-// [+] added acpul
-// 0.2.5 ]
-// 0.2.4 [
-// [+] fixed objc m mm
-// 0.2.4 ]
-// 0.2.3 [
-// [+] bugfixing - expand on reload page
-// 0.2.3 ]
-// [+] added state save/restore
-// [+] send broadcast event update. livecomment heartbeat
-// [+] notify client onChange event
-// [+] show source on click
-// [+] menu base (on/off ui components, change form)
-// [+] add language type to <code...>
-// [+] add file filter by ext/type
-// [+] prism: fixed escape
-// [-] hljs: disabled, using prism (faster)
-// [+] client: click $.toggle scope
-// [+] show code with hljs
-// [+] fixed connectAsset pwd path setup
-// [+] added script bin/livecomment
-// [+] client view tree base
-// [+] code as node_module updated
-// [+] "ignore watch scan" paths config
-// SOLVED ]
 
 // MODULE DEPS [
 
@@ -163,6 +55,24 @@ function LiveComment(options) {
     return !(config.noLogging && config.noLogging.indexOf(s) != -1)
   }
 
+  // Log config options on startup
+  console.log("\n=== LiveComment Configuration ===");
+  console.log("Server Settings:");
+  console.log("  Port:", config.port);
+  console.log("  WebSocket Port:", config.ws_port);
+  console.log("  WebSocket Client Port:", config.ws_port_client || 'same as server');
+  console.log("\nSecurity Settings:");
+  console.log("  Dangerous Code Execution:", config.dangerousCodeExecution || 'disabled');
+  console.log("  Client Code Execution:", config.clientCodeExecution ? 'enabled' : 'disabled');
+  console.log("\nFile Processing:");
+  console.log("  Max File Size:", config.maxFileSize ? `${config.maxFileSize} bytes` : 'unlimited');
+  console.log("  File Process Delay:", config.fileProcessDelay ? `${config.fileProcessDelay}ms` : '0ms');
+  console.log("\nLogging:");
+  console.log("  Disabled Logs:", config.noLogging ? config.noLogging.join(', ') : 'none');
+  console.log("\nSupported File Types:");
+  console.log("  Extensions:", Object.keys(config.extlangs || {}).join(', ') || 'none');
+  console.log("==============================\n");
+
   // CONFIG ]
   // HTTP SERVER [
 
@@ -171,7 +81,7 @@ function LiveComment(options) {
   app.set('port', config.port);
 
   app.set('views', path.join(__dirname, 'views'));
-  app.set('view engine', 'jade');
+  app.set('view engine', 'pug');
   app.use(connectAssets({
     paths: [__dirname+'/public/css', __dirname+'/public/js'],
     helperContext: app.locals
@@ -193,9 +103,14 @@ function LiveComment(options) {
 
   app.use('/img', express.static(__dirname+'/public/img'));
 
-  app.listen(app.get('port'), function() {
+  // Start the server
+  var server = app.listen(app.get('port'), function() {
     console.log("✔ Express server listening on port %d in %s mode", app.get('port'), app.settings.env);
   });
+
+  // Export the server instance
+  this.server = server;
+  this.app = app;
 
   // HTTP SERVER ]
 
@@ -205,16 +120,17 @@ function LiveComment(options) {
 
   console.log("✔ socket.io server listening on port %d", config.ws_port);
 
-  var io = require('socket.io').listen(config.ws_port);
+  var io = require('socket.io')(config.ws_port);
 
   io.sockets.on('connection', function (socket) {
+
 
     console.log('Client', socket.handshake.address);
 
     // SEND CONNECTED [
 
     var time = (new Date).toLocaleTimeString();
-    socket.json.send({'event': 'connected', 'time': time});
+    socket.emit('message', {'event': 'connected', 'time': time});
 
     // SEND CONNECTED ]
     // SEND INITIAL STATE - todo: client should require hash list [
@@ -243,7 +159,7 @@ function LiveComment(options) {
         if (!o)
           return
 
-//        var buf = fs.readFileSync(o.filename, "utf8");
+
         objects[o.name] = {
           name: o.name,
           extlang: o.extlang,
@@ -251,7 +167,7 @@ function LiveComment(options) {
         }
         files[o.name] = o.lines //buf.split('\n');
       });
-      socket.json.send({'event': 'state', 'objects': objects, 'files': files});
+      socket.emit('message', {'event': 'state', 'objects': objects, 'files': files});
     };
 
 //    sendState(socket);
@@ -293,7 +209,7 @@ function LiveComment(options) {
         socket.__lcFileCS = socket.__lcFileCS || {}
         if (!(socket.__lcFileCS[obj.name] && socket.__lcFileCS[obj.name] == hash)) {
           socket.__lcFileCS[obj.name] = hash
-          socket.json.send({'event': 'object.updated', 'object': obj, 'file': file});
+          socket.emit('message', {'event': 'object.updated', 'object': obj, 'file': file});
         }
         else {
           console.log("duplicate "+ o.name)
@@ -308,6 +224,7 @@ function LiveComment(options) {
   });
 
   // WS SERVER ]
+
   // OBJECT EXECUTOR [
   // constructor [
 
@@ -745,9 +662,31 @@ function LiveComment(options) {
   // MERGE LOGIC ]
   // ANALYZE FILE [
 
-  function analyze(filename, analyzeCallback) {
-
+  function analyze(filename, callback) {
     var stack = [];
+
+    function analyzeCallback() {
+      process.nextTick(() => {
+        callback()
+      })
+    }
+  
+      // CHECK MAX FILE SIZE [
+    try {
+      const stats = fs.statSync(filename);
+      const fileSize = stats.size;
+      if (fileSize > config.maxFileSize) {
+        console.warn(`Skip file ${fileSize} > ${config.maxFileSize} maxFileSize ${filename}`)
+        analyzeCallback()
+        return
+      }
+    } catch (error) {
+      console.error('Error getting file size:', error)
+      analyzeCallback()
+      return
+    }
+    // CHECK MAX FILE SIZE ]
+  
     var input = fs.createReadStream(filename);
     var fileext = path.extname(filename);
     var lineN = 0;
