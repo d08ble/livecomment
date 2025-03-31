@@ -145,6 +145,7 @@ console.log("workingDirectory", workingDirectory)
   }
   if (argv.ws_port) {
     options.ws_port = argv.ws_port
+    options.ws_port_client = argv.ws_port
   }
   if (argv.ws_port_client) {
     options.ws_port_client = argv.ws_port_client
