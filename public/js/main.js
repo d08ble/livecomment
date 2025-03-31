@@ -335,6 +335,10 @@ var highlightCodeProcess = function (mode, $el, subnode) {
 // UPDATE STATE [
 
 MainView.prototype.updateState = function updateState($el, objects, sources) {
+  return this.updateStateJQuery($el, objects, sources)
+
+  // TODO: REMOVE
+
 //  console.log(objects, sources);
   var s = ''
   var s_
@@ -452,9 +456,9 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
 
   $el.html(s);
 
-  restoreHideShow($el.find('.node'))
+  //restoreHideShow($el.find('.node'))
 
-  highlightCodeProcess('show', $el, true)
+  //highlightCodeProcess('show', $el, true)
 
   this.delegateEvents($el);
 
@@ -463,7 +467,150 @@ MainView.prototype.updateState = function updateState($el, objects, sources) {
   // EXECUTOR.HOOK: afterElementUpdate ]
 };
 
-// UPDATE STATE ]
+MainView.prototype.updateStateJQuery = function updateStateJQuery($el, objects, sources) {
+  var self = this;
+
+  // Clear existing content
+  $el.empty();
+
+  // Process each scope
+  _.each(objects, function(scope) {
+    if (codeExecution == "true") {
+      // 1. unmount prev scope
+      var prev = self.scopes[scope.name];
+      prev && _.each(prev, function (o, key) {
+        executor.unmount(key);
+      });
+
+      // 2. process
+      executor.process(scope, sources);
+    }
+
+    // Update scope keys
+    var keys = {};
+    _.each(scope.objects, function(object, name) {
+      keys[name] = true;
+    });
+    self.scopes[scope.name] = keys;
+
+    var tree = new Tree();
+    _.each(scope.objects, function(object, name) {
+      transformObjectToTree(tree, name, object);
+    });
+
+    scope.uid = calcMD5(scope.name);
+
+    // Create scope container
+    var $scope = $('<div>', {
+      class: 'scope',
+      id: 's-' + scope.uid,
+      'data-nodes': 'show',
+      'data-code': 'hide'
+    });
+
+    // Add scope name
+    $scope.append($('<div>', {
+      class: 'scope-name',
+      text: scope.name
+    }));
+
+    // Process nodes recursively
+    function processNode(node, k) {
+      // Equivalent to htmlStringNodeHeader:
+      // Original: '<div class="node" id="n-'+htmlEscape(nodeName)+'" data-nodes="show" data-code="hide">'
+      // Original: '<div class="node-name" style="padding-left: '+k*10+'px;">'+htmlEscape(node.name)+' '+node.lines[0]+','+node.lines[1]+'</div>'
+      var $node = $('<div>', {
+        class: 'node',
+        id: 'n-' + (node.uid || 's-' + scope.uid),
+        'data-nodes': 'show',
+        'data-code': 'hide'
+      });
+
+      if (k !== 0) {
+        $node.append($('<div>', {
+          class: 'node-name',
+          style: 'padding-left: ' + (k * 10) + 'px',
+          text: node.name + ' ' + node.lines[0] + ',' + node.lines[1]
+        }));
+      }
+
+      var begin = 0;
+      var end = sources[scope.name].length;
+
+      if (node.lines) {
+        begin = node.lines[0];
+        end = node.lines[1];
+      }
+
+      // Process children
+      _.each(node._children, function(child, i) {
+        var beginC = child.lines[0];
+        var endC = child.lines[1];
+
+        // Add code block between nodes
+        if (begin < beginC) {
+          var lines = sources[scope.name].slice(begin, beginC - 1);
+          while (lines.length > 0 && lines[0] === '') {
+            lines = lines.slice(1);
+          }
+          if (lines.length > 0) {
+            var $pre = $('<pre>', {
+              style: 'padding-left: 50px; display: none;'
+            });
+            $pre.append($('<code>', {
+              class: 'language-' + scope.extlang,
+              'data-nodes': 'show',
+              'data-code': 'hide',
+              text: lines.join('\n')
+            }));
+            $node.append($pre);
+          }
+        }
+
+        // Add child node
+        $node.append(processNode(child, k + 1));
+        begin = endC;
+      });
+
+      // Add final code block
+      if (begin < end) {
+        var lines = sources[scope.name].slice(begin, end - 1);
+        while (lines.length > 0 && lines[0] === '') {
+          lines = lines.slice(1);
+        }
+        if (lines.length > 0) {
+          var $pre = $('<pre>', {
+            style: 'padding-left: 50px; display: none;'
+          });
+          $pre.append($('<code>', {
+            class: 'language-' + scope.extlang,
+            'data-nodes': 'show',
+            'data-code': 'hide',
+            text: lines.join('\n')
+          }));
+          $node.append($pre);
+        }
+      }
+
+      return $node;
+    }
+
+    // Add root node
+    $scope.append(processNode(tree.root, 0));
+    $el.append($scope);
+  });
+
+  restoreHideShow($el.find('.node'))
+
+  highlightCodeProcess('show', $el, true)
+
+  // Delegate events
+  this.delegateEvents($el);
+
+  // Execute hooks
+  executor.hook('afterElementUpdate', $el);
+};
+
 // UPDATE STATE OBJECT [
 
 MainView.prototype.updateStateObject = function updateStateObject(object, source) {

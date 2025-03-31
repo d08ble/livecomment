@@ -77,6 +77,7 @@
     'dangerousCodeExecutionClient': '(depreacted, always enabled) run js plugins in html, can controll your browser',
     'dangerousCodeExecutionServer': 'run js plugins locally, can access your system files (default: disabled)',
     'fileProcessDelay': 'file process delay (default: 1s)',
+    'maxFileSize': 'max file size',
     'debug': 'enable debug mode (default: NO)',
     'log': 'enable logging for event types: watch.skip, watch.scan, object.parsed, exe.emit, exe.frame, exe.onframe, run.eval',
     'verbose': 'verbose',
@@ -154,7 +155,11 @@ console.log("workingDirectory", workingDirectory)
   if (argv.fileProcessDelay) {
     options.fileProcessDelay = argv.fileProcessDelay
   }
-  
+
+  if (argv.maxFileSize) {
+    options.maxFileSize = argv.maxFileSize
+  }
+
   // Always enable frontend plugins
   options.dangerousCodeExecution.push('client')
 
