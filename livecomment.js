@@ -794,7 +794,7 @@ function LiveComment(options) {
                 var c = stack.pop();
                 ok = true;
               } else
-                cbs.error('Found close tag without match start tag'+tag[0]);
+                cbs.error('Found close tag without match start tag '+tag[0]);
               // dirty hack! ]
               if (ok) {
                 var c = stack.pop();

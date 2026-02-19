@@ -1,0 +1,121 @@
+# Live Comment Block Organization
+
+## Cursor Shortcuts
+
+When the user types these shortcuts, interpret them as livecomment operations:
+
+### `lc` - LiveComment Current File
+Add structured comment blocks to the currently open file. Analyzes code and adds block start/name/end markers following the livecomment pattern.
+
+**Action:** Analyze the current file and add livecomment blocks around logical code sections.
+
+### `lc file` or `lc file <path>` - LiveComment Specific File
+Add structured comment blocks to a specific file.
+
+**Action:** If no path specified, ask user which file. Then analyze and add livecomment blocks to that file.
+
+### `lc all` - LiveComment Entire Project
+Add structured comment blocks to all files in the current project.
+
+**Action:** Recursively process all code files in the project, adding livecomment blocks where appropriate.
+
+### `lc find <keyword>` - Find and Highlight Code
+Find code sections, dependencies, and references by keyword (case-insensitive), similar to C/C++/Python symbol search.
+
+**Example:** `lc find ssl` finds all SSL-related code and adds livecomment blocks around relevant sections.
+
+**Action:** 
+1. Search for keyword across codebase (case-insensitive)
+2. Identify matching code sections, dependencies, and references
+3. Add livecomment blocks around found sections
+4. Report locations and context
+
+---
+
+## Pattern Description
+
+Use live comment blocks to organize and label sections of code with clear start and end markers.
+
+## Syntax
+
+'# ... [' define start
+'# ... [' define end
+... is a text like AAA
+
+Use same text for start and end, not like "# END AAA ]" etc
+
+- **Block Start**: `# BLOCK_NAME [`
+- **Block End**: `# BLOCK_NAME ]`
+- **Block Name**: Use any text with any syms until '[' or ']' end
+
+
+## Examples
+
+### Function Call Block
+```python
+# CALL MAIN [
+
+main()
+
+# CALL MAIN ]
+```
+
+### Function Definition Block
+```python
+# MAIN [
+
+def main():
+    pass
+
+# MAIN ]
+```
+
+### Configuration Block
+```python
+# LOAD CONFIG [
+
+yaml_config = load_config_yaml()
+self.config = create_bittensor_test_config(yaml_config)
+
+# LOAD CONFIG ]
+```
+
+### Stage/Phase Blocks
+```python
+# STAGE 1 [
+
+def stage1(self) -> None:
+    """Stage 1: Initialize and start the bittensor node."""
+    self.load_keys()
+    self.setup_axon(port=8099)
+    self.start_axon()
+
+# STAGE 1 ]
+```
+
+## Best Practices
+
+1. **Consistent Naming**: Use descriptive, UPPERCASE names that clearly indicate the block's purpose
+2. **Logical Grouping**: Group related code operations within the same block
+3. **Nested Blocks**: Avoid deep nesting; prefer flat organization
+4. **Documentation**: Add docstrings or comments within blocks to explain complex logic
+5. **Maintenance**: Keep block names consistent across the codebase
+
+## Common Block Types
+
+- `# INITIALIZATION [`
+- `# CONFIGURATION [`
+- `# SETUP [`
+- `# MAIN_LOOP [`
+- `# CLEANUP [`
+- `# ERROR_HANDLING [`
+- `# VALIDATION [`
+- `# PROCESSING [`
+
+## Benefits
+
+- **Code Organization**: Clear visual separation of logical code sections
+- **Navigation**: Easy to find and jump to specific functionality
+- **Documentation**: Self-documenting code structure
+- **Maintenance**: Easier to refactor and modify specific sections
+- **Collaboration**: Team members can quickly understand code structure

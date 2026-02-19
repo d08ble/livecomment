@@ -1,0 +1,165 @@
+---
+alwaysApply: true
+---
+# LiveComment Cursor Shortcuts
+
+## What is LiveComment?
+
+LiveComment is your **digital memory implant** for code - a brain helper that makes
+code self-documenting and navigable. Wrap logical code blocks with descriptive tags
+that explain WHAT the code does (not what construct type it is).
+
+**Core idea:** `# Find and remove files [` NOT `# FUNC [`
+
+## Shortcut Aliases
+
+When the user types these shortcuts, interpret them as livecomment operations:
+
+### `lc` - Start LiveComment
+Start the livecomment server for code navigation and documentation.
+
+**Command:**
+```bash
+cd <project_root> && node bin/livecomment .
+```
+
+Opens web interface at http://localhost:3070/
+
+---
+
+### `lc file` or `lc file <path>` - Highlight File
+Analyze and highlight a specific file's comment structure.
+
+**Command:**
+```bash
+livecomment --path <filepath>
+```
+
+If no path specified, use current file or ask user.
+
+---
+
+### `lc all` - Highlight Project
+Analyze and highlight all files in the current project.
+
+**Command:**
+```bash
+cd <project_root> && livecomment .
+```
+
+---
+
+### `lc find <keyword>` - Find and Highlight Code
+Find code sections, dependencies, and references by keyword (case-insensitive).
+Works like C/C++/Python symbol search.
+
+**Steps:**
+1. Search for keyword using ripgrep (case-insensitive):
+```bash
+rg -i "<keyword>" --type c --type cpp --type py --type js --type ts --type rust
+```
+
+2. Show results with context:
+```bash
+rg -i "<keyword>" -C 3
+```
+
+3. Optionally start livecomment to visualize:
+```bash
+livecomment .
+```
+
+**Example:** `lc find ssl` finds all SSL-related code in C/C++/Python/JS files.
+
+---
+
+## PROMPT Livecomment
+
+When user says "PROMPT Livecomment" or wants to add livecomments to Python code:
+
+**Key Rule:** Tags must be DESCRIPTIVE - describe WHAT the code does, not the construct type.
+
+BAD: # FUNC [, # ARRAY [, # CLASS [, # LOOP [
+GOOD: # Find and remove files [, # Update all items in range [, # Parse config settings [
+
+### Python Example
+
+```python
+# MAIN [
+
+def main():
+    # Find and remove files [
+    
+    files = find_files()
+    remove(files)
+    
+    # Find and remove files ]
+    # Update all items in range 0..100 [
+    
+    for a in range(100):
+        # Update item highlight [
+        
+        item = read(a)
+        mark_highlight(item)
+        store(a)
+
+        # Update item highlight ]
+
+    # Update all items in range 0..100 ]
+
+# MAIN ]
+```
+
+### Guidelines
+
+1. **Describe intent, not structure** - "Initialize database connection" not "INIT"
+2. **Nest comments inside functions** - highlight logical blocks within code
+3. **Use in loops and conditionals** - describe what each branch/iteration does
+4. **Apply to data structures** - "User authentication config" not "DICT"
+5. **Keep tags human-readable** - they become navigation labels
+
+---
+
+## Comment Tag Syntax Reference
+
+Use these tags to structure code for livecomment:
+
+**C/C++/JavaScript/TypeScript/Rust/Swift:**
+```
+// MODULE DEPS [
+var fs = require('fs');
+// MODULE DEPS ]
+```
+
+**Python/Shell/TOML:**
+```
+# CONFIG SECTION [
+config = load_config()
+# CONFIG SECTION ]
+```
+
+**CSS:**
+```
+/* STYLES [
+.container { ... }
+/* STYLES ]
+```
+
+---
+
+## Quick Reference
+
+| Shortcut | Action | Command |
+|----------|--------|---------|
+| `lc` | Start server | `livecomment .` |
+| `lc file` | Highlight file | `livecomment --path <file>` |
+| `lc all` | Highlight project | `livecomment .` |
+| `lc find <kw>` | Find code/deps | `rg -i "<kw>"` + `livecomment .` |
+
+## Project Files Reference
+
+- Main module: [livecomment.js](mdc:livecomment.js)
+- CLI entry: [bin/livecomment](mdc:bin/livecomment)
+- CLI implementation: [bin/livecomment-cli.js](mdc:bin/livecomment-cli.js)
+- Default config: [config/config.js](mdc:config/config.js)
+- Skill file: [skills/livecomment.skill](mdc:skills/livecomment.skill)

@@ -1,0 +1,242 @@
+# LiveComment Skill
+# Code navigation and documentation tool for vibe coding
+
+## What is LiveComment?
+
+LiveComment is your **digital memory implant** for code - a brain helper that makes
+code self-documenting and navigable. It's the missing link in code evolution.
+
+**Core Idea:** Wrap logical code blocks with descriptive comment tags that explain
+WHAT the code does, not what type of construct it is. LiveComment parses these tags
+to create a live, navigable structure of your codebase with real-time updates.
+
+**Think of it as:**
+- Code navigator for 80/20 developers
+- Local cloud IDE extension
+- Code refactoring helper
+- Live documentation that stays in sync with code
+
+## Description
+LiveComment is a live code documentation and navigation tool that parses
+special comment tags (like `// SECTION [` and `// SECTION ]`) to create
+structured, navigable documentation with real-time updates.
+
+## Supported Languages
+- JavaScript/TypeScript (.js, .ts)
+- C/C++ (.c, .h, .cpp, .hpp)
+- Python (.py)
+- Rust (.rs)
+- Swift (.swift)
+- Objective-C (.m, .mm)
+- Shell (.sh)
+- CSS/LESS (.css, .less)
+- And more...
+
+## Comment Tag Format
+
+### Syntax Rules
+- **Block Start**: `# BLOCK_NAME [` (or `//` or `/*` depending on language)
+- **Block End**: `# BLOCK_NAME ]` (use same text for start and end)
+- **Block Name**: Use any text with any symbols until `[` or `]`
+- **Important**: Use same text for start and end, not like "# END AAA ]"
+
+### C-style languages (JS, C/C++, Rust, Swift)
+```
+// SECTION NAME [
+// ... code and comments ...
+// SECTION NAME ]
+```
+
+### Python/Shell
+```
+# SECTION NAME [
+# ... code and comments ...
+# SECTION NAME ]
+```
+
+### CSS
+```
+/* SECTION NAME [
+... styles ...
+/* SECTION NAME ]
+```
+
+## PROMPT: How to Add LiveComments
+
+**Key Rule:** Tags must be DESCRIPTIVE - describe WHAT the code does, not the construct type.
+
+❌ BAD: `# FUNC [`, `# ARRAY [`, `# CLASS [`, `# LOOP [`
+✅ GOOD: `# Find and remove files [`, `# Update all items in range [`, `# Parse config settings [`
+
+### Python Examples
+
+#### Function Definition and Call
+```python
+# MAIN [
+
+def main():
+    # Find and remove files [
+    
+    files = find_files()
+    remove(files)
+    
+    # Find and remove files ]
+    # Update all items in range 0..100 [
+    
+    for a in range(100):
+        # Update item highlight [
+        
+        item = read(a)
+        mark_highlight(item)
+        store(a)
+
+        # Update item highlight ]
+
+    # Update all items in range 0..100 ]
+
+# MAIN ]
+
+# CALL MAIN [
+
+main()
+
+# CALL MAIN ]
+```
+
+#### Configuration Block
+```python
+# LOAD CONFIG [
+
+yaml_config = load_config_yaml()
+self.config = create_bittensor_test_config(yaml_config)
+
+# LOAD CONFIG ]
+```
+
+#### Stage/Phase Blocks
+```python
+# STAGE 1 [
+
+def stage1(self) -> None:
+    """Stage 1: Initialize and start the bittensor node."""
+    self.load_keys()
+    self.setup_axon(port=8099)
+    self.start_axon()
+
+# STAGE 1 ]
+```
+
+### Guidelines for Adding LiveComments
+
+1. **Describe intent, not structure** - "Initialize database connection" not "INIT"
+2. **Nest comments inside functions** - highlight logical blocks within code
+3. **Use in loops and conditionals** - describe what each branch/iteration does
+4. **Apply to data structures** - "User authentication config" not "DICT"
+5. **Keep tags human-readable** - they become navigation labels
+
+### Best Practices
+
+1. **Consistent Naming**: Use descriptive, UPPERCASE names that clearly indicate the block's purpose
+2. **Logical Grouping**: Group related code operations within the same block
+3. **Nested Blocks**: Avoid deep nesting; prefer flat organization
+4. **Documentation**: Add docstrings or comments within blocks to explain complex logic
+5. **Maintenance**: Keep block names consistent across the codebase
+
+### What to Annotate
+
+- **Functions/methods** - describe their purpose
+- **Loop bodies** - what transformation happens
+- **Conditional blocks** - what each branch handles
+- **Data definitions** - what the data represents
+- **Import sections** - group by purpose (e.g., "HTTP dependencies")
+- **Configuration** - what settings control
+
+### Benefits
+
+- **Code Organization**: Clear visual separation of logical code sections
+- **Navigation**: Easy to find and jump to specific functionality
+- **Documentation**: Self-documenting code structure
+- **Maintenance**: Easier to refactor and modify specific sections
+- **Collaboration**: Team members can quickly understand code structure
+
+## Operations
+
+### lc - Start LiveComment Server
+Start the livecomment web server for code navigation.
+```bash
+livecomment [options] [path]
+# or
+node bin/livecomment [options] [path]
+```
+
+Options:
+- `--port <port>` - HTTP port (default: 3070)
+- `--ws_port <port>` - WebSocket port (default: 8980)
+- `--path <path>` - Path to scan
+- `--ignore <regexp>` - Ignore pattern
+- `--debug` - Enable debug mode
+- `--verbose` - Verbose output
+- `--maxFileSize <bytes>` - Max file size to process
+- `--fileProcessDelay <ms>` - Delay between file processing
+
+### lc file - Highlight Single File
+Analyze and highlight a specific file's comment structure.
+```bash
+livecomment --path <filepath>
+```
+
+### lc all - Highlight Entire Project
+Analyze and highlight all project files.
+```bash
+livecomment .
+# or
+livecomment --path /path/to/project
+```
+
+### lc find - Find and Highlight Code/Dependencies
+Find code sections, dependencies, and references by keyword (case-insensitive).
+Use grep/ripgrep to find occurrences, then start livecomment to visualize:
+
+```bash
+# Find all occurrences (case-insensitive)
+rg -i "<keyword>" --type c --type cpp --type py --type js
+
+# Example: Find SSL references
+rg -i "ssl" --type c --type cpp --type py --type js
+
+# Then highlight with livecomment
+livecomment .
+```
+
+## Web Interface
+After starting, open: http://localhost:3070/
+
+## Example Usage
+
+```bash
+# Start server for current directory
+livecomment .
+
+# Start with custom ports
+livecomment --port 5000 --ws_port 5001 .
+
+# Ignore node_modules and .git
+livecomment --ignore '\.git\/' --ignore '\/node_modules.*' .
+
+# Analyze specific path
+livecomment --path /path/to/src
+```
+
+## Programmatic Usage
+
+```javascript
+var LiveComment = require('livecomment');
+
+var options = {
+  port: 3070,
+  ws_port: 3071,
+  paths: ['/path/to/dir/']
+};
+
+var livecomment = new LiveComment(options);
+```
