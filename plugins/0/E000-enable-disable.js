@@ -102,6 +102,21 @@ if (!window.__ed) {
       // collect enabled items ]
       // collect disabled items [
       var disabledLines = [];
+      function walkAllChildren($parent, depth) {
+        $parent.children('.node').each(function() {
+          var $n = $(this);
+          var $nm = $n.children('.node-name').first();
+          if ($nm.length) {
+            var name = $nm.text().trim().replace(/\s+\d+,\d+$/, '');
+            if (name) {
+              var indent = '';
+              for (var i = 0; i < depth; i++) indent += ' ';
+              disabledLines.push(indent + name);
+            }
+          }
+          walkAllChildren($n, $nm.length ? depth + 1 : depth);
+        });
+      }
       function walkDisabled($parent, depth) {
         $parent.children('.node').each(function() {
           var $n = $(this);
@@ -115,6 +130,7 @@ if (!window.__ed) {
                 disabledLines.push(indent + name);
               }
             }
+            walkAllChildren($n, $nm.length ? depth + 1 : depth);
             return;
           }
           walkDisabled($n, $nm.length ? depth + 1 : depth);
