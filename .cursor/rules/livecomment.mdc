@@ -70,28 +70,6 @@ def main():
 # MAIN ]
 ```
 
-### Configuration Block
-```python
-# LOAD CONFIG [
-
-yaml_config = load_config_yaml()
-self.config = create_bittensor_test_config(yaml_config)
-
-# LOAD CONFIG ]
-```
-
-### Stage/Phase Blocks
-```python
-# STAGE 1 [
-
-def stage1(self) -> None:
-    """Stage 1: Initialize and start the bittensor node."""
-    self.load_keys()
-    self.setup_axon(port=8099)
-    self.start_axon()
-
-# STAGE 1 ]
-```
 
 ## Best Practices
 
@@ -100,17 +78,6 @@ def stage1(self) -> None:
 3. **Nested Blocks**: Avoid deep nesting; prefer flat organization
 4. **Documentation**: Add docstrings or comments within blocks to explain complex logic
 5. **Maintenance**: Keep block names consistent across the codebase
-
-## Common Block Types
-
-- `# INITIALIZATION [`
-- `# CONFIGURATION [`
-- `# SETUP [`
-- `# MAIN_LOOP [`
-- `# CLEANUP [`
-- `# ERROR_HANDLING [`
-- `# VALIDATION [`
-- `# PROCESSING [`
 
 ## Benefits
 
