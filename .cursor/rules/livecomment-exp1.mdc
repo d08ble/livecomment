@@ -70,6 +70,36 @@ livecomment .
 
 ---
 
+### `lc install` - Install to Global Cursor Rules
+Install the livecomment cursor rule to the global `~/.cursor/rules/` directory so it is available in all projects.
+
+**Action:**
+1. Detect OS and resolve the global rules directory:
+   - **Linux**: `~/.cursor/rules/`
+   - **Mac**: `~/.cursor/rules/`
+   - **Windows**: `%USERPROFILE%\.cursor\rules\`
+2. Create the directory if it doesn't exist
+3. Copy this project's `.cursor/rules/livecomment.mdc` to the global rules directory
+
+**Commands:**
+
+Linux / Mac:
+```bash
+mkdir -p ~/.cursor/rules && cp "<project_root>/.cursor/rules/livecomment.mdc" ~/.cursor/rules/livecomment.mdc
+```
+
+Windows (PowerShell):
+```powershell
+$dir = "$env:USERPROFILE\.cursor\rules"; if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }; Copy-Item "<project_root>\.cursor\rules\livecomment.mdc" "$dir\livecomment.mdc" -Force
+```
+
+Windows (cmd):
+```cmd
+if not exist "%USERPROFILE%\.cursor\rules" mkdir "%USERPROFILE%\.cursor\rules" & copy "<project_root>\.cursor\rules\livecomment.mdc" "%USERPROFILE%\.cursor\rules\livecomment.mdc"
+```
+
+---
+
 ## Comment Tag Syntax Reference
 
 Use these tags to structure code for livecomment:
@@ -101,10 +131,10 @@ config = load_config()
 
 | Shortcut | Action | Command |
 |----------|--------|---------|
-| `lc` | Start server | `livecomment .` |
 | `lc file` | Highlight file | `livecomment --path <file>` |
 | `lc all` | Highlight project | `livecomment .` |
 | `lc find <kw>` | Find code/deps | `rg -i "<kw>"` + `livecomment .` |
+| `lc install` | Install global rule | `cp .cursor/rules/livecomment.mdc ~/.cursor/rules/` |
 
 ## Project Files Reference
 

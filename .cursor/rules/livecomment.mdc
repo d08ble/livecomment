@@ -1,25 +1,30 @@
+---
+alwaysApply: true
+---
+
 # Live Comment Block Organization
 
 ## Cursor Shortcuts
 
-When the user types these shortcuts, interpret them as livecomment operations:
+When the user types these shortcuts, interpret them as livecomment operations.
+Each command supports a concatenated alias (no space): e.g. `lchelp` = `lc help`, `lcfile` = `lc file`, etc.
 
 ### `lc` - LiveComment Current File
 Add structured comment blocks to the currently open file. Analyzes code and adds block start/name/end markers following the livecomment pattern.
 
 **Action:** Analyze the current file and add livecomment blocks around logical code sections.
 
-### `lc file` or `lc file <path>` - LiveComment Specific File
+### `lc file` or `lc file <path>` (alias: `lcfile`, `lcfile <path>`) - LiveComment Specific File
 Add structured comment blocks to a specific file.
 
 **Action:** If no path specified, ask user which file. Then analyze and add livecomment blocks to that file.
 
-### `lc all` - LiveComment Entire Project
+### `lc all` (alias: `lcall`) - LiveComment Entire Project
 Add structured comment blocks to all files in the current project.
 
 **Action:** Recursively process all code files in the project, adding livecomment blocks where appropriate.
 
-### `lc find <keyword>` - Find and Highlight Code
+### `lc find <keyword>` (alias: `lcfind <keyword>`) - Find and Highlight Code
 Find code sections, dependencies, and references by keyword (case-insensitive), similar to C/C++/Python symbol search.
 
 **Example:** `lc find ssl` finds all SSL-related code and adds livecomment blocks around relevant sections.
@@ -29,6 +34,96 @@ Find code sections, dependencies, and references by keyword (case-insensitive), 
 2. Identify matching code sections, dependencies, and references
 3. Add livecomment blocks around found sections
 4. Report locations and context
+
+### `lc auto on` / `lc auto off` (alias: `lcauto on` / `lcauto off`) - Auto-LiveComment New Code
+Toggle automatic livecomment mode. When enabled, every time new code is added or generated (e.g. new functions, classes, blocks), the agent automatically wraps it in livecomment block markers following the project's comment pattern.
+
+- **`lc auto on`** — Enable auto-livecomment. From this point forward, any new code the agent writes will be wrapped in appropriate `# BLOCK_NAME [` / `# BLOCK_NAME ]` markers.
+- **`lc auto off`** — Disable auto-livecomment. New code is added without automatic block markers (default behavior).
+
+**Action:**
+1. Remember the current auto-livecomment state for the session.
+2. When **on**: after adding any new code (functions, classes, config sections, imports, etc.), automatically insert livecomment block start/end markers around the new code using descriptive UPPERCASE block names.
+3. When **off**: add code normally without automatic block markers.
+
+**Example — with `lc auto on`:**
+If the agent adds a new function `process_data()`, it will automatically produce:
+```python
+# PROCESS DATA [
+
+def process_data(items):
+    return [transform(i) for i in items]
+
+# PROCESS DATA ]
+```
+
+### `lc reload` (alias: `lcreload`) - Reload Rules from Home
+lc reload = re-read all .mdc rules from global
+Re-read all `.mdc` rules from `~/.cursor/rules/` (Linux/Mac/WSL) or `%USERPROFILE%\.cursor\rules\` (Windows). Use this after updating global rules in another project.
+
+**Action:** Read and apply rules from the global `~/.cursor/rules/` directory.
+
+!!!IMPORTANT!!! remember global rules path to prevent scan next time.
+also copy to local dir
+
+#### How to verify
+
+Prompt 
+```
+Do you know what the "lc" command does? List all available lc subcommands and briefly describe each one.
+```
+```
+Do you know what the "lc" command does? List all available lc subcommands and briefly describe each one. not current project. its prompt. global rules
+think, short and quick reply!
+CHECK GLOBAL RULES!!! 
+WRITE SHORTEST FORM TO USE `lc reload` from a new prompt
+```
+
+### `lc help` (alias: `lchelp`) - List All Commands
+Show a summary of all available `lc` commands.
+
+**Action:** Print the following help text:
+
+```
+LiveComment Commands (aliases in parentheses):
+
+  lc                  LiveComment current file - add structured comment blocks
+  lc file [<path>]    LiveComment a specific file                          (lcfile)
+  lc all              LiveComment all files in the project                 (lcall)
+  lc find <keyword>   Find code sections by keyword (case-insensitive)    (lcfind)
+  lc auto on/off      Auto-wrap new code in livecomment blocks            (lcauto)
+  lc reload           Reload rules from ~/.cursor/rules/                  (lcreload)
+  lc install          Install livecomment rule to global ~/.cursor/rules/ (lcinstall)
+  lc help             Show this help message                              (lchelp)
+```
+
+### `lc install` (alias: `lcinstall`) - Install to Global Cursor Rules
+Install the livecomment cursor rule to the global `~/.cursor/rules/` directory so it is available in all projects.
+
+**Action:**
+1. Detect OS and resolve the global rules directory:
+   - **Linux**: `~/.cursor/rules/`
+   - **Mac**: `~/.cursor/rules/`
+   - **Windows**: `%USERPROFILE%\.cursor\rules\`
+2. Create the directory if it doesn't exist
+3. Copy this project's `.cursor/rules/livecomment.mdc` to the global rules directory
+
+**Commands:**
+
+Linux / Mac:
+```bash
+mkdir -p ~/.cursor/rules && cp "<project_root>/.cursor/rules/livecomment.mdc" ~/.cursor/rules/livecomment.mdc
+```
+
+Windows (PowerShell):
+```powershell
+$dir = "$env:USERPROFILE\.cursor\rules"; if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }; Copy-Item "<project_root>\.cursor\rules\livecomment.mdc" "$dir\livecomment.mdc" -Force
+```
+
+Windows (cmd):
+```cmd
+if not exist "%USERPROFILE%\.cursor\rules" mkdir "%USERPROFILE%\.cursor\rules" & copy "<project_root>\.cursor\rules\livecomment.mdc" "%USERPROFILE%\.cursor\rules\livecomment.mdc"
+```
 
 ---
 

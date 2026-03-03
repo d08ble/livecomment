@@ -25,7 +25,7 @@
     "node-watch": "^0.7.3",
     "optimist": "^0.6.1",
     "pug": "^3.0.2",
-    "scanwatch": "file:../scanwatch",
+    "scanwatch": "^0.2.0",
     "socket.io": "^4.7.2",
     "underscore": "^1.13.6",
     "walkdir": "^0.4.1"
