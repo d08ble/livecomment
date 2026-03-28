@@ -55,7 +55,8 @@ pre {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1;
+  /* Above VSCode/monaco minimap / editor layers (they use z-index in the tens–hundreds) */
+  z-index: 500;
   width: 100%;
   border-bottom: 5px solid #ddd;
   background: #eee;

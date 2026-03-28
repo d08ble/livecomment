@@ -549,9 +549,11 @@ MainView.prototype.updateStateJQuery = function updateStateJQuery($el, objects, 
 
         // Add code block between nodes
         if (begin < beginC) {
+          var lineStart0 = begin
           var lines = sources[scope.name].slice(begin, beginC - 1);
           while (lines.length > 0 && lines[0] === '') {
             lines = lines.slice(1);
+            lineStart0 += 1
           }
           if (lines.length > 0) {
             var $pre = $('<pre>', {
@@ -561,6 +563,7 @@ MainView.prototype.updateStateJQuery = function updateStateJQuery($el, objects, 
               class: 'language-' + scope.extlang,
               'data-nodes': 'show',
               'data-code': 'hide',
+              'data-lc-line-start': String(lineStart0),
               text: lines.join('\n')
             }));
             $node.append($pre);
@@ -574,9 +577,11 @@ MainView.prototype.updateStateJQuery = function updateStateJQuery($el, objects, 
 
       // Add final code block
       if (begin < end) {
+        var lineStart1 = begin
         var lines = sources[scope.name].slice(begin, end - 1);
         while (lines.length > 0 && lines[0] === '') {
           lines = lines.slice(1);
+          lineStart1 += 1
         }
         if (lines.length > 0) {
           var $pre = $('<pre>', {
@@ -586,6 +591,7 @@ MainView.prototype.updateStateJQuery = function updateStateJQuery($el, objects, 
             class: 'language-' + scope.extlang,
             'data-nodes': 'show',
             'data-code': 'hide',
+            'data-lc-line-start': String(lineStart1),
             text: lines.join('\n')
           }));
           $node.append($pre);

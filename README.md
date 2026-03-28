@@ -1,48 +1,48 @@
 
-### LiveComment information tool for Node
+### LiveComment — web framework for Node and your AI code
 
-LiveComment is the missing link in the Evolution of the Web.
+A small **web framework** around your repo: Express serves the UI, Socket.IO keeps the tree in sync, and **plugins** extend the browser with the same `//:=frame('client.exec')` story on client and server. Your **code** stays center stage. Built for fast navigation, live reload, and **AI-assisted** work (one surface for you, your editor, and tools).
 
 #### Features
 
-* Impossible simple & minimalistic quine
-* Powerfull multilanguage plugin system with live reload
-* Single code for Frontend/Backend, just set like //:=frame('client.exec')
+* Minimal core, strong **plugin** story with live reload (`plugins/0/…`)
+* **Same code** for client and server where you want it — e.g. `//:=frame('client.exec')`
+* **Auto ports**: if HTTP or WebSocket ports are taken, the next free ones are used (see console)
+* Optional **VSCode/monaco** for code blocks (themes, line modes, fit height) — plugin `D000-monaco-editor.js`
+* **Drag–drop** scopes and nodes, safer path paste — `C000-drag-drop-content.js`
+* **Color tags** on nodes, persisted locally, filter/hide by color — `F000-color-buttons.js`
+* Multilanguage highlighting, file watch, code navigator
 
-#### Live demo:
+#### Screens
 
-[http://acpul.org/livecomment](http://acpul.org/livecomment)
+![LiveComment](public/img/screen1.png)
 
-#### Info
+#### Vibe
 
-![alt text]( https://cdn.rawgit.com/d08ble/media/master/screen0.png "LiveComment inside")
-![alt text]( http://41.media.tumblr.com/d84b3498f829138b0742429bf9841e2e/tumblr_nn08gkQe8v1ut3bxko1_1280.jpg "LightTable+LiveComment")
-
-* LiveComment for 80/20 developers
-* -1'000'000+ miles for your target
-* Code navigator
-* Code refactroing
-* Local cloud IDE extension
-* Your digital memory implant, brain helper
-* Copy of your main
+* For 80/20 developers who live in the tree
+* Code navigator, refactor-friendly structure
+* Local “cloud IDE” extension: browser + your disk
+* Brain helper for big codebases — and for models that need **grounded** file context
 
 #### Install
 
 ```
-$ npm install livecomment --save
+$ npm install -g livecomment
 ```
 
-#### Run Demo
+#### Run demo
 
+Livecomment current directory
+Scan for files contains livecomment blocks `# PYTHON-BLOCK [` or `// C-BLOCK [`  
 ```
-$ node bin/livecomment
+$ livecomment
 ```
 
 #### Open URL
 
 [http://localhost:3070/](http://localhost:3070/)
 
-#### Usage sample 
+#### Usage sample
 
 ```javascript
 
@@ -50,7 +50,7 @@ $ node bin/livecomment
 
 var LiveComment = require('livecomment');
 
-// Define options (default options location livecomment/config/config.js)
+// Define options (defaults: livecomment/config/config.js)
 
 var options = {
   port: 3070,
@@ -83,10 +83,17 @@ var options = {
 var livecomment = new LiveComment(options);
 
 ```
+
 #### Console output sample
-See on console like that:
+
+If a configured port is already in use, you will see a line like `HTTP port 3070 in use, using 3071` (and similarly for the WebSocket port). Default case:
+
 ```
-✔ socket.io server listening on port 8980
+=== LiveComment Configuration ===
+Server Settings:
+  ...
+==============================
+
 EXE.ONFRAME [server.exec][][frame] function
 Scan files [
 /path/to/dir/livecomment [
@@ -101,6 +108,7 @@ Watch for changes [
  /path/to/dir/livecomment/public/js
  /path/to/dir/livecomment/views
 Watch for changes ]
+✔ socket.io server listening on port 3071
 ✔ Express server listening on port 3070 in development mode
 /path/to/dir/livecomment/bin/index-debug.js javascript
 EXE.EMIT [this][CHECK FORMAT][mount] undefined CHECK FORMAT
@@ -110,6 +118,12 @@ EXE.EMIT [this][DEFAULT CONFIG][mount] undefined DEFAULT CONFIG
 /path/to/dir/livecomment/livecomment.js javascript
 ...
 ```
+
+(Order of the two `✔` lines can vary slightly. If ports clash, the printed numbers match the chosen ports.)
+
+#### Archive
+
+Archive [README-old.md](README-old.md).
 
 #### Donate BTC
 

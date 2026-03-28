@@ -34,6 +34,7 @@ var async = require('async');
 var md5 = require('MD5');
 var events = require('events');
 var scanwatch = require('scanwatch');
+var net = require('net');
 
 // MODULE DEPS ]
 // LiveComment [
@@ -55,6 +56,81 @@ function LiveComment(options) {
     return !(config.noLogging && config.noLogging.indexOf(s) != -1)
   }
 
+  // CONFIG ]
+
+  // RESOLVE PORTS [
+  // Pick first free port from requested value upward; WS avoids colliding with chosen HTTP port.
+
+  var reqHttp = Number(config.port);
+  var reqWs = Number(config.ws_port);
+  var tieWsClient = (Number(config.ws_port_client) === reqWs);
+  var excludePorts = {};
+
+  function probeAvailable(startPort, cb) {
+    var p = startPort;
+    var attempts = 0;
+    var maxAttempts = 256;
+    function tryOnce() {
+      if (attempts++ > maxAttempts) {
+        return cb(new Error('No free port found starting near ' + startPort));
+      }
+      while (excludePorts[p] && p < 65536) {
+        p++;
+      }
+      if (p > 65535) {
+        return cb(new Error('No free port in valid range'));
+      }
+      var s = net.createServer();
+      s.unref();
+      s.once('error', function (err) {
+        if (err.code === 'EADDRINUSE') {
+          p++;
+          tryOnce();
+        } else {
+          cb(err);
+        }
+      });
+      s.listen(p, function () {
+        var chosen = p;
+        s.close(function () {
+          cb(null, chosen);
+        });
+      });
+    }
+    tryOnce();
+  }
+
+  var self = this;
+  probeAvailable(reqHttp, function (err, httpPort) {
+    if (err) {
+      console.error(err.message || err);
+      process.exit(1);
+    }
+    if (httpPort !== reqHttp) {
+      console.log('HTTP port %d in use, using %d', reqHttp, httpPort);
+    }
+    config.port = httpPort;
+    excludePorts[httpPort] = true;
+
+    probeAvailable(reqWs, function (err2, wsPort) {
+      if (err2) {
+        console.error(err2.message || err2);
+        process.exit(1);
+      }
+      if (wsPort !== reqWs) {
+        console.log('WebSocket port %d in use, using %d', reqWs, wsPort);
+      }
+      config.ws_port = wsPort;
+      if (tieWsClient) {
+        config.ws_port_client = wsPort;
+      }
+      startServersAndRest.call(self);
+    });
+  });
+
+  // RESOLVE PORTS ]
+
+  function startServersAndRest() {
   // Log config options on startup
   console.log("\n=== LiveComment Configuration ===");
   console.log("Server Settings:");
@@ -73,7 +149,6 @@ function LiveComment(options) {
   console.log("  Extensions:", Object.keys(config.extlangs || {}).join(', ') || 'none');
   console.log("==============================\n");
 
-  // CONFIG ]
   // HTTP SERVER [
 
   var app = express();
@@ -118,9 +193,8 @@ function LiveComment(options) {
 
   // WS SERVER [
 
-  console.log("✔ socket.io server listening on port %d", config.ws_port);
-
   var io = require('socket.io')(config.ws_port);
+  console.log("✔ socket.io server listening on port %d", config.ws_port);
 
   io.sockets.on('connection', function (socket) {
 
@@ -907,6 +981,8 @@ function LiveComment(options) {
   }
 
   // dbgbrk ]
+
+  }
 
 };
 

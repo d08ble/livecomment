@@ -1,4 +1,12 @@
 // SOLVED [
+// 0.2.28 - 2026-03-28 auto-port, VSCode/monaco, colors, drag-drop [
+// [+] auto-port, http, ws: livecomment.js: probe free HTTP + WebSocket ports when defaults in use (net, scan up, max 256)
+// [+] livecomment.js: start Express/socket.io after ports fixed. Sync ws_port_client when tied to ws_port.
+// [+] C000 drag-drop: turn scope and node labels into draggable handles. Paste/drop paths without leaking full machine paths.
+// [+] D000 VSCode/monaco: swap static code snippets for that editor (syntax, sizing, many languages via CDN)
+// [+] F000 color tags: paint nodes with a small palette. Choices stick in the browser. Filter or hide the tree by color.
+// 0.2.28 - 2026-03-28 auto-port, VSCode/monaco, colors, drag-drop ]
+
 // 0.2.23 - 2025-03-21 updated dependencies [
 // [+] Moved version history to separate file
 // [+] Updated dependencies to newer versions including:
