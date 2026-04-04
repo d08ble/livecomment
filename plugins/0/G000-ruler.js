@@ -467,6 +467,21 @@ if (!window.__lcRuler) {
         if ($node.find('.lc-ruler[data-ruler-id="' + cfg.id + '"]').length) return
         var padLeft = parseInt(this.style.paddingLeft, 10) || 0
         var $slot = $('<div class="lc-ruler-slot" style="padding-left:' + (padLeft + 10) + 'px"></div>')
+        var lsKey = _LS_PFX + cfg.id + '_vis'
+        var hidden = false
+        try { hidden = localStorage.getItem(lsKey) === '0' } catch (e) {}
+        var $btn = $('<span class="lc-ruler-toggle" title="Toggle ruler"></span>')
+        $btn.text(hidden ? '\u25b6' : '\u25bc')
+        var $label = $(this).find('.lc-node-name-label')
+        var $target = $label.length ? $label : $(this)
+        if (!$target.find('.lc-ruler-toggle').length) $target.append($btn)
+        if (hidden) $slot.hide()
+        $btn.on('click', function (ev) {
+          ev.stopPropagation()
+          var vis = $slot.is(':visible')
+          if (vis) { $slot.hide(); $btn.text('\u25b6') } else { $slot.show(); $btn.text('\u25bc') }
+          try { localStorage.setItem(lsKey, vis ? '0' : '1') } catch (e) {}
+        })
         $(this).after($slot)
         new window.LcRuler($slot[0], cfg)
       })
@@ -547,10 +562,21 @@ this.onFrame('ruler', '', 'frame', function () {
   width: 100%;
   cursor: grab;
 }
+.lc-ruler-toggle {
+  display: inline-block;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 9px;
+  color: #666;
+  vertical-align: middle;
+}
+.lc-ruler-toggle:hover {
+  color: #ff8800;
+}
 .lc-ruler-note {
   padding: 4px 10px;
   font: 11px/1.4 sans-serif;
-  color: #4488ff;
+  color: purple !important;
   background: transparent;
   margin: 2px 10px 4px 10px;
   white-space: nowrap;
