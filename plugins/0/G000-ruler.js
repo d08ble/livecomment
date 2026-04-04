@@ -69,6 +69,7 @@ if (!window.__lcRuler) {
     this.canvas = this.$canvas[0]
     this.ctx = this.canvas.getContext('2d')
     this.canvasW = 800
+    this.hoverX = null
     this.dragging = false
     this.dragStartX = 0
     this.dragStartOffset = 0
@@ -279,6 +280,25 @@ if (!window.__lcRuler) {
       }
       this._updateFlags()
     }
+
+    if (this.hoverX != null) {
+      var hx = this.hoverX
+      var hv = this.xToValue(hx)
+      ctx.save()
+      ctx.strokeStyle = '#ff8800'
+      ctx.lineWidth = 1
+      ctx.setLineDash([4, 3])
+      ctx.beginPath()
+      ctx.moveTo(hx, tickY - majH - 12)
+      ctx.lineTo(hx, tickY + 2)
+      ctx.stroke()
+      ctx.setLineDash([])
+      ctx.fillStyle = '#ff8800'
+      ctx.font = 'bold 10px monospace'
+      ctx.textAlign = 'center'
+      ctx.fillText(_fmtVal(hv, this.unit), hx, tickY + 16)
+      ctx.restore()
+    }
   }
 
   P._drawMarker = function (idx, tickY) {
@@ -333,21 +353,24 @@ if (!window.__lcRuler) {
   P.onMouseMove = function (e) {
     if (this.dragging) return
     var r = this.canvas.getBoundingClientRect()
-    var hit = this._hitMarker(e.clientX - r.left, e.clientY - r.top)
+    var mx = e.clientX - r.left
+    var hit = this._hitMarker(mx, e.clientY - r.top)
+    this.hoverX = mx
     if (hit !== this.hoverMarker) {
       this.hoverMarker = hit
       this.canvas.style.cursor = hit >= 0 ? 'pointer' : 'grab'
-      this.render()
       this.updateNote()
     }
+    this.render()
   }
 
   P.onMouseLeave = function () {
+    this.hoverX = null
     if (this.hoverMarker >= 0) {
       this.hoverMarker = -1
-      this.render()
       this.updateNote()
     }
+    this.render()
   }
 
   P.onWheel = function (e) {
