@@ -111,9 +111,29 @@ EXE.EMIT [this][DEFAULT CONFIG][mount] undefined DEFAULT CONFIG
 ...
 ```
 
-#### Donate BTC
+#### Donate
 
+BTC 💰
 18Bth1u3pSJzPrCf21tx1F6iSzA2fgKdfU
+
+SOL Solana 💰
+9gLVQr97baX3KrG9DyaUDd5FwXaiLcDuU6CK5RCNMnWu
+
+ETH Ethereum 💰
+0x072c709a8Ad95Fc182e0E2EEF834C3d944122f0b
+
+USDT Ethereum 💰
+0x072c709a8Ad95Fc182e0E2EEF834C3d944122f0b
+
+DOGE Dogecoin 💰
+DJP8425i4sGT4tSEXwEDRPJb4vJBGroJs6
+
+LTC Litecoin 💰
+ltc1q69gg9udgqnky60n7mfzfaj0w7lu80ujx6fysly
+
+TRX Tron 💰
+TLjkoQfnu7aRRbVRkEYN1vZPzW7ntuM4tn
+
 
 #### License
 
