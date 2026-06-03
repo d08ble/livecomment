@@ -631,14 +631,20 @@ MainView.prototype.updateStateObject = function updateStateObject(object, source
   var file = {}
   file[object.name] = source.split('\n')
   this.updateState(a, [object], file)
+  return a
 };
 
 // UPDATE STATE OBJECT ]
 // MAIN VIEW ]
+// GLOBAL MAIN VIEW [
+
+window.__lcMainView = null;
 
 $(document).ready(function onReady() {
 
   var mainView = new MainView();
+
+  window.__lcMainView = mainView;
 
   // WS CLIENT [
   class LiveCommentSocket extends SocketIOClient {
@@ -667,6 +673,8 @@ $(document).ready(function onReady() {
       }
     }
   }
+// GLOBAL MAIN VIEW ]
+
 
   const socket = new LiveCommentSocket(window.location.hostname, ws_port);
   socket.connect();
