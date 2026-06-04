@@ -40,51 +40,51 @@ Extensions in `plugins/0/` (live reload). With the server running, open [http://
 * [I001 Export tree](#i001-export-tree) — [plugins/0/I001-export-tree.js](plugins/0/I001-export-tree.js)
 * [J001 HN Firebase plugin — Ask HN: Who is hiring?](#j001-hn-firebase) — [plugins/0/J001-hn-firebase.js](plugins/0/J001-hn-firebase.js)
 
-## 0000 Init — [plugins/0/0000-init.js](plugins/0/0000-init.js)
+## 0000 Init
 
-Client and server bootstrap (`client.exec` / `server.exec`); registers `client.css` frame for scoped `<style>` tags; default menu and scope styling.
+[plugins/0/0000-init.js](plugins/0/0000-init.js) — Client and server bootstrap (`client.exec` / `server.exec`); registers `client.css` frame for scoped `<style>` tags; default menu and scope styling.
 
-## A000 Route — [plugins/0/A000-route.js](plugins/0/A000-route.js)
+## A000 Route
 
-Server routes `/b`, `/c`, `/plugins`; `filterRoute` rewrites `*HIDE*` nodes and `*TEST_HOSTNAME*` placeholders; `?queryHash=plugins_only` limits the tree to `plugins/0/`.
+[plugins/0/A000-route.js](plugins/0/A000-route.js) — Server routes `/b`, `/c`, `/plugins`; `filterRoute` rewrites `*HIDE*` nodes and `*TEST_HOSTNAME*` placeholders; `?queryHash=plugins_only` limits the tree to `plugins/0/`.
 
-## B000 URL iframe preview — [plugins/0/B000-url-iframe-preview.js](plugins/0/B000-url-iframe-preview.js)
+## B000 URL iframe preview
 
-**Preview** button on highlighted links in code blocks; toggles an inline iframe (sites with `X-Frame-Options` may not embed).
+[plugins/0/B000-url-iframe-preview.js](plugins/0/B000-url-iframe-preview.js) — **Preview** button on highlighted links in code blocks; toggles an inline iframe (sites with `X-Frame-Options` may not embed).
 
-## C000 Drag-drop content — [plugins/0/C000-drag-drop-content.js](plugins/0/C000-drag-drop-content.js)
+## C000 Drag-drop content
 
-Drag scope names and node names from the tree; drop into editors or paste paths (basenames for local files, full URL for `http(s)`).
+[plugins/0/C000-drag-drop-content.js](plugins/0/C000-drag-drop-content.js) — Drag scope names and node names from the tree; drop into editors or paste paths (basenames for local files, full URL for `http(s)`).
 
-## D000 Monaco editor — [plugins/0/D000-monaco-editor.js](plugins/0/D000-monaco-editor.js)
+## D000 Monaco editor
 
-Monaco / VS Code editor for code blocks (CDN); language mapping, themes, line-number modes, fit-to-content height.
+[plugins/0/D000-monaco-editor.js](plugins/0/D000-monaco-editor.js) — Monaco / VS Code editor for code blocks (CDN); language mapping, themes, line-number modes, fit-to-content height.
 
-## E000 Enable-disable — [plugins/0/E000-enable-disable.js](plugins/0/E000-enable-disable.js)
+## E000 Enable-disable
 
-Toggle nodes on/off in the tree (persisted in `localStorage`); undo/redo; export enabled or disabled outline from the menu.
+[plugins/0/E000-enable-disable.js](plugins/0/E000-enable-disable.js) — Toggle nodes on/off in the tree (persisted in `localStorage`); undo/redo; export enabled or disabled outline from the menu.
 
-## F000 Color buttons — [plugins/0/F000-color-buttons.js](plugins/0/F000-color-buttons.js)
+## F000 Color buttons
 
-Twelve color tags per node (stored locally); filter or hide by color; reading-line scroll offset below the menu.
+[plugins/0/F000-color-buttons.js](plugins/0/F000-color-buttons.js) — Twelve color tags per node (stored locally); filter or hide by color; reading-line scroll offset below the menu.
 
-## G000 Ruler — [plugins/0/G000-ruler.js](plugins/0/G000-ruler.js)
+## G000 Ruler
 
-Log-scale ruler widgets on nodes via `//:=frame('ruler')` JSON config; markers, cursor, pan/zoom; visibility persisted per ruler.
+[plugins/0/G000-ruler.js](plugins/0/G000-ruler.js) — Log-scale ruler widgets on nodes via `//:=frame('ruler')` JSON config; markers, cursor, pan/zoom; visibility persisted per ruler.
 
-## I000 AI — [plugins/0/I000-ai.js](plugins/0/I000-ai.js)
+## I000 AI
 
-**AI** menu button (placeholder for future AI actions).
+[plugins/0/I000-ai.js](plugins/0/I000-ai.js) — **AI** menu button (placeholder for future AI actions).
 
-## I001 Export tree — [plugins/0/I001-export-tree.js](plugins/0/I001-export-tree.js)
+## I001 Export tree
 
-**Export** menu button: MainView tree → livecomment block syntax per scope; preview, copy, single or multi-file download, optional ZIP.
+[plugins/0/I001-export-tree.js](plugins/0/I001-export-tree.js) — **Export** menu button: MainView tree → livecomment block syntax per scope; preview, copy, single or multi-file download, optional ZIP.
 
 <a id="j001-hn-firebase"></a>
 
-## J001 HN Firebase - Ask HN: Who is hiring? — [plugins/0/J001-hn-firebase.js](plugins/0/J001-hn-firebase.js)
+## J001 HN Firebase - Ask HN: Who is hiring?
 
-Loads the monthly ([Ask HN: Who is hiring? (June)](https://news.ycombinator.com/item?id=48357725)) thread through the [HN Firebase API](https://github.com/HackerNews/API), builds a nested LiveComment tree (comments → nodes, jobs → segment text) and decorates job lines with location hints (country flags, remote / on-site). **Hiring HN** menu button shows fetch progress while the thread loads.
+[plugins/0/J001-hn-firebase.js](plugins/0/J001-hn-firebase.js) — Loads the monthly ([Ask HN: Who is hiring? (June)](https://news.ycombinator.com/item?id=48357725)) thread through the [HN Firebase API](https://github.com/HackerNews/API), builds a nested LiveComment tree (comments → nodes, jobs → segment text) and decorates job lines with location hints (country flags, remote / on-site). **Hiring HN** menu button shows fetch progress while the thread loads.
 
 ![J001 — Hacker News Firebase — Who is hiring?](public/img/screen2.png)
 
