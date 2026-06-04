@@ -1,0 +1,16 @@
+{
+  "name": "livecomment-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static LiveComment frontend for Vercel (built from ../public)",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "npm run build && node serve.mjs",
+    "preview": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "less": "^4.2.0"
+  }
+}
