@@ -1,6 +1,9 @@
 // plugin: hn hiring reload (HR) [
 //: = this.frame('client.exec')
 
+// pungg10kk@gmail.com
+
+
 this.dbgbrk('J000 Hacker News Reader')
 var self = this
 

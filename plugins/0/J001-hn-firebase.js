@@ -1,6 +1,8 @@
 // plugin: hn firebase api (J001) [
 //:= this.frame('client.exec')
 
+// pungg10kk@gmail.com
+
 this.dbgbrk('J001 Hacker News Firebase')
 var self = this
 
