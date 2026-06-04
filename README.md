@@ -80,9 +80,9 @@ Extensions in `plugins/0/` (live reload). Index:
 
 `I001-export-tree.js` — **Export** menu button: MainView tree → livecomment block syntax per scope; preview, copy, single or multi-file download, optional ZIP.
 
-## J001 HN Firebase — Hacker News Who is hiring plugin
+## J001 HN Firebase - Hacker News Who is hiring plugin
 
-`J001-hn-firebase.js` — Loads the monthly **Ask HN: Who is hiring?** thread ([item 48357725](https://news.ycombinator.com/item?id=48357725)) through the [HN Firebase API](https://github.com/HackerNews/API), builds a nested LiveComment tree (comments → nodes, jobs → segment text), and decorates job lines with location hints (country flags, remote / on-site). **Hiring HN** menu button shows fetch progress while the thread loads.
+`J001-hn-firebase.js` — Loads the monthly **Ask HN: Who is hiring?** thread ([Who is Hiring (June)](https://news.ycombinator.com/item?id=48357725)) through the [HN Firebase API](https://github.com/HackerNews/API), builds a nested LiveComment tree (comments → nodes, jobs → segment text) and decorates job lines with location hints (country flags, remote / on-site). **Hiring HN** menu button shows fetch progress while the thread loads.
 
 ![J001 — Hacker News Firebase — Who is hiring?](public/img/screen2.png)
 
