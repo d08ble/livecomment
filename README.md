@@ -38,7 +38,6 @@ Extensions in `plugins/0/` (live reload). Index:
 * [G000 Ruler](#g000-ruler)
 * [I000 AI](#i000-ai)
 * [I001 Export tree](#i001-export-tree)
-* [J000 HN HR](#j000-hn-hr)
 * [J001 HN Firebase — Who is hiring](#j001-hn-firebase)
 
 ## 0000 Init
@@ -80,12 +79,6 @@ Extensions in `plugins/0/` (live reload). Index:
 ## I001 Export tree
 
 `I001-export-tree.js` — **Export** menu button: MainView tree → livecomment block syntax per scope; preview, copy, single or multi-file download, optional ZIP.
-
-## J000 HN HR
-
-`J000-hn-hr.js` — Hacker News “Who is hiring?” thread from HTML (direct fetch or CORS proxy); one scope per comment; **HR** menu button with optional 10s auto-reload.
-
-<a id="j001-hn-firebase"></a>
 
 ## J001 HN Firebase — Hacker News Who is hiring plugin
 
